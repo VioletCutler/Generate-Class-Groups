@@ -5,6 +5,7 @@ const Nav = () => {
         <nav>
             <Link to='/'>Generate Groups</Link>
             <Link to='/login'>Login</Link>
+            <Link to='/register'>Register</Link>
         </nav>
     )
 }
