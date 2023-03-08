@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
-import { studentList } from "../helperFunctions/dummyData"
+import { studentList, absentStudentList } from "../helperFunctions/dummyData"
 
 const Homepage = () => {
     const [classList, setClassList] = useState(studentList)
-    const [absentStudents, setAbsentStudents] = useState([])
- 
+    const [absentStudents, setAbsentStudents] = useState(absentStudentList)
+
 
     function handleAbsentStudentClick(e){
         console.log(e.target.id)

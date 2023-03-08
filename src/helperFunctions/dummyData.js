@@ -3,7 +3,17 @@ const studentList = [];
 for (let i = 0; i < 50; i++) {
   studentList.push(`Student Number ${i}`);
 }
-const absentStudents = [];
+
+console.log(studentList)
+const absentStudentList = [];
+for (let i = 0; i < 10; i++){
+  const absentStudentListIndex = Math.floor(Math.random() * studentList.length)
+  absentStudentList.push(studentList[absentStudentListIndex])
+  studentList.splice(absentStudentListIndex, 1)
+}
+
+
+
 
 
 // For any students who need extra support, you can add them to this list and they will be added to a pre-existing group
@@ -18,6 +28,6 @@ const haveToBePaired = {
 module.exports = {
   studentList,
   haveToBePaired,
-  absentStudents,
+  absentStudentList,
   studentsToAddToPreexistingGroup,
 };
