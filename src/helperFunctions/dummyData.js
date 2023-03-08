@@ -6,7 +6,7 @@ for (let i = 0; i < 50; i++) {
 
 console.log(studentList)
 const absentStudentList = [];
-for (let i = 0; i < 10; i++){
+for (let i = 0; i < 3; i++){
   const absentStudentListIndex = Math.floor(Math.random() * studentList.length)
   absentStudentList.push(studentList[absentStudentListIndex])
   studentList.splice(absentStudentListIndex, 1)
