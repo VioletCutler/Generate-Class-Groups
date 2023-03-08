@@ -25,9 +25,24 @@ const haveToBePaired = {
   // 1: ["Student1", "Student2"],
 };
 
+
+const newUsers = [
+  {
+    username: 'Admin',
+    password: '12345678',
+    isAdmin: true
+  },
+  {
+    username: 'Test User 1',
+    password: '12345678',
+    isAdmin: false
+  }
+]
+
 module.exports = {
   studentList,
   haveToBePaired,
   absentStudentList,
   studentsToAddToPreexistingGroup,
+  newUsers
 };
