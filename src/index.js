@@ -1,23 +1,24 @@
 import { createRoot } from "react-dom/client";
+import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { 
     Nav,
     Homepage,
-    Login,
-    Register 
+    Account
 } from './components/index'
 
 const App = () => {
+    const [loggedIn, setLoggedIn] = useState(false)
+
   return (
     <Router>
       <div>
         <h1>Generate Student Groups</h1>
-        <Nav/>
+        <Nav loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>
         <main>
             <Routes>
-                <Route path="/" element={<Homepage/>}/>
-                <Route path="/login" element={<Login/>}/>
-                <Route path="/register" element={<Register/>}/>
+                <Route path="/makegroups" element={<Homepage loggedIn={loggedIn}/>}/>
+                <Route path='/' element={<Account/>}/>
             </Routes>
         </main>
       </div>

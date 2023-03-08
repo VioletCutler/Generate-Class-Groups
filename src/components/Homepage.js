@@ -4,12 +4,17 @@ import { studentList } from "../helperFunctions/dummyData"
 const Homepage = () => {
     const [classList, setClassList] = useState(studentList)
     const [absentStudents, setAbsentStudents] = useState([])
+ 
 
     function handleAbsentStudentClick(e){
         console.log(e.target.id)
         console.log(classList[e.target.id])
         setAbsentStudents([...absentStudents, classList[e.target.id]])
-        const updatedClassList = classList.splice(e.target.id, 1)
+        const updatedClassList = [];
+        for (let i = 0; i < classList.length; i++){
+            if (i != e.target.id)updatedClassList.push(classList[i])
+        }
+        setClassList(updatedClassList)
     }
 
     return (

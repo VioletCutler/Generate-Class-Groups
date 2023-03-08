@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom';
 
-const Login = () => {
+const Login = ({setRegistered}) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
     const navigate = useNavigate()
+
     function handleSubmit(e){
         e.preventDefault()
         navigate('/')
@@ -24,7 +25,7 @@ const Login = () => {
         <input type='submit'  ></input>
         <p>password must be 8-16 characters long</p>
       </form>
-      <div>Not signed up? click <Link to='/register'>here</Link> to register</div>
+      <div>Not signed up? click <button onClick={() => setRegistered(false)}>here</button> to register</div>
     </div>
   );
 };
