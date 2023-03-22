@@ -1,4 +1,4 @@
-const { createInstructor, createStudent, getAllStudents } = require("./");
+const { createInstructor, createStudent, getAllStudents, getStudentsByInstructor, getAllInstructors } = require("./");
 const { newInstructors, newStudents } = require("../src/dummyData/dummyData");
 const { client } = require("./client");
 
@@ -62,7 +62,10 @@ async function testDB() {
   try {
     console.log("beginning to test db");
     const allStudents = await getAllStudents()
-    console.log('getting all students:', allStudents)
+    console.log('All Students:', allStudents)
+
+    const allInstructors = await getAllInstructors()
+    console.log('All Instructors:', allInstructors)
 
     
   } catch (error) {

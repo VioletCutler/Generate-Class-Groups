@@ -64,7 +64,22 @@ const newStudents = [
     name: 'Juan R.',
     classroom: '2301-ftb-mt-web-ft',
     instructorId: 2
-  }
+  },
+  {
+    name: 'Keesha L.',
+    classroom: '2301-ftb-et-web-ft',
+    instructorId: 1
+  },
+  {
+    name: 'Trevor P.',
+    classroom: '2301-ftb-et-web-ft',
+    instructorId: 1
+  },
+  {
+    name: 'Ramon R.',
+    classroom: '2301-ftb-et-web-ft',
+    instructorId: 1
+  },
 ]
 
 module.exports = {
