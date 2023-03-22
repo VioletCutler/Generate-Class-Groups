@@ -26,7 +26,7 @@ const haveToBePaired = {
 };
 
 
-const newUsers = [
+const newInstructors = [
   {
     username: 'Admin',
     password: '12345678',
@@ -36,6 +36,34 @@ const newUsers = [
     username: 'Test User 1',
     password: '12345678',
     isAdmin: false
+  },
+  {
+    username: 'Test User 2',
+    password: '12345678',
+    isAdmin: false
+  }
+]
+
+const newStudents = [
+  {
+    name: 'Gina S.',
+    classroom: '2301-ftb-mt-web-ft',
+    instructorId: 2
+  },
+  {
+    name: 'Roberta P.',
+    classroom: '2301-ftb-mt-web-ft',
+    instructorId: 2
+  },
+  {
+    name: 'Maxwell T.',
+    classroom: '2301-ftb-mt-web-ft',
+    instructorId: 2
+  },
+  {
+    name: 'Juan R.',
+    classroom: '2301-ftb-mt-web-ft',
+    instructorId: 2
   }
 ]
 
@@ -44,5 +72,6 @@ module.exports = {
   haveToBePaired,
   absentStudentList,
   studentsToAddToPreexistingGroup,
-  newUsers
+  newInstructors,
+  newStudents
 };

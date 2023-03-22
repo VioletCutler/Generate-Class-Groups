@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { studentList, absentStudentList } from "../../db/dummyData"
+import { studentList, absentStudentList } from "../dummyData/dummyData.js"
 
 const Homepage = () => {
     const [classList, setClassList] = useState(studentList)

@@ -1,50 +1,76 @@
-const { createUser } = require('./users')
-const { newUsers } = require('./dummyData')
-const { client } = require('./client')
+const { createInstructor, createStudent, getAllStudents } = require("./");
+const { newInstructors, newStudents } = require("../src/dummyData/dummyData");
+const { client } = require("./client");
 
-async function dropTables(){
-    try{
-        console.log('starting to drop tables...')
-        await client.query(`
-            DROP TABLE IF EXISTS "users";
-        `)
-        console.log('...finished dropping tables')
-    } catch(error){
-        console.log(error)
-    }
+async function dropTables() {
+  try {
+    console.log("starting to drop tables...");
+    await client.query(`
+            DROP TABLE IF EXISTS "students";
+            DROP TABLE IF EXISTS "instructors";
+        `);
+    console.log("...finished dropping tables");
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-async function createTables(){
-    try{
-        console.log('starting to create tables...')
-        await client.query(`
-            CREATE TABLE "users"(
+async function createTables() {
+  try {
+    console.log("starting to create tables...");
+    await client.query(`
+            CREATE TABLE "instructors" (
                 id SERIAL PRIMARY KEY,
                 username VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL, 
                 isAdmin BOOLEAN DEFAULT false 
             );
-        `)
-        console.log('...finished creating tables')
-    } catch(error){
-        console.log(error)
-    }
+            CREATE TABLE "students" (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                classroom VARCHAR(255) NOT NULL,
+                "instructorId" INTEGER REFERENCES instructors(id)
+                );
+        `);
+    console.log("...finished creating tables");
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-async function buildDatabase(){
-    try{
-        client.connect()
+async function buildDatabase() {
+  try {
+    client.connect();
 
-        await dropTables()
-        await createTables()
-        console.log(newUsers)
-        const users = await Promise.all(newUsers.map((newUser) => createUser(newUser)))
-        console.log(users)
+    console.log("beginning to build database...");
+    await dropTables();
+    await createTables();
+    await Promise.all(
+      newInstructors.map((newUser) => createInstructor(newUser))
+    );
+    await Promise.all(
+      newStudents.map((newStudent) => createStudent(newStudent))
+    );
 
-        client.end()
-    } catch(error){
-        console.log(error)
-    }
+    console.log("...finished building database");
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function testDB() {
+  try {
+    console.log("beginning to test db");
+    const allStudents = await getAllStudents()
+    console.log('getting all students:', allStudents)
+
+    
+  } catch (error) {
+    throw error;
+  }
 }
 
 buildDatabase()
+  .then(testDB)
+  .catch(console.error)
+  .finally(() => client.end());
