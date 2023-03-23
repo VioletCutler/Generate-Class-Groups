@@ -37,7 +37,6 @@ async function getAllInstructors() {
       `);
 
     for (let instructor of rows) {
-
       instructor.students = await getStudentsByInstructor(instructor.id);
     }
     return rows;

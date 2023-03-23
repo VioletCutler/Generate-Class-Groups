@@ -25,21 +25,19 @@ async function updateStudent(id, fields = {}) {
   if (setString.length === 0) {
     return;
   }
-
+console.log('line 28', id)
   try {
-    const {
-      rows: [instructor],
-    } = await client.query(
+    const { rows: [student] } = await client.query(
       `
             UPDATE students
             SET ${setString}
             WHERE id=${id}
-            RETURNING *
-        `,
-      Object.values(fields)
+            RETURNING *;
+        `, 
+        Object.values(fields)
     );
-
-    return instructor;
+    
+    return student;
   } catch (error) {
     throw error;
   }
