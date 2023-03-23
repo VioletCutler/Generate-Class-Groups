@@ -25,8 +25,11 @@ async function updateStudent(id, fields = {}) {
   if (setString.length === 0) {
     return;
   }
-console.log('line 28', id)
+
   try {
+    if (setString.length > 0){
+
+    
     const { rows: [student] } = await client.query(
       `
             UPDATE students
@@ -38,6 +41,7 @@ console.log('line 28', id)
     );
     
     return student;
+    }
   } catch (error) {
     throw error;
   }
