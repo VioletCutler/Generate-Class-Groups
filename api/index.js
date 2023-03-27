@@ -1,6 +1,7 @@
 const Express = require('express');
 const router = Express.Router();
 const { client } = require('../db/client')
+
 router.use('*', (req, res, next)=> {
     console.log('a request is being made to the API router')
     next()
@@ -20,8 +21,11 @@ router.use('/health', async (req, res, next)=>{
 })
 
 router.use(async(req, res, next)=> {
-    console.log('req middleware')
-    res.send('Authorization')
+    console.log('authorization middleware')
+    next()
 })
+
+const instructorsRouter = require('./instructors')
+router.use('/instructors', instructorsRouter)
 
 module.exports = router

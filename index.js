@@ -2,7 +2,7 @@ const { client } = require("./db/client");
 const morgan = require('morgan')
 const Express = require("express");
 const app = Express();
-const PORT = 8080
+const PORT = 1337
 
 app.use(morgan('dev'))
 app.use(Express.json())
@@ -26,6 +26,8 @@ app.use((error, req, res, next)=> {
     console.log('Error', error)
     res.send({error: error.message, name: error.name, message: error.message, table: error.table})
 })
+
+client.connect()
 
 app.listen(PORT, ()=>{
     console.log(`Server is listening on PORT ${PORT}`)

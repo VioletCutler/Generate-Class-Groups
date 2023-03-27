@@ -9,9 +9,9 @@ async function createInstructor({ username, password, isAdmin }) {
       rows: [user],
     } = await client.query(
       `
-        INSERT INTO instructors(username, password, isAdmin) VALUES ($1, $2, $3)
+        INSERT INTO instructors(username, password, "isAdmin") VALUES ($1, $2, $3)
         ON CONFLICT (username) DO NOTHING 
-        RETURNING id, username, isAdmin
+        RETURNING id, username, "isAdmin"
       `,
       [username, hashedPassword, isAdmin]
     );
@@ -31,14 +31,15 @@ async function getStudentsByInstructor(id) {
 
 async function getAllInstructors() {
   try {
+    console.log('get all instructors')
     const { rows } = await client.query(`
-        SELECT *
+        SELECT id, username, "isAdmin"
         FROM "instructors"
       `);
-
-    for (let instructor of rows) {
-      instructor.students = await getStudentsByInstructor(instructor.id);
-    }
+    console.log('ALL INSTRUCTORS', rows)
+    // for (let instructor of rows) {
+    //   instructor.students = await getStudentsByInstructor(instructor.id);
+    // }
     return rows;
   } catch (error) {
     throw error;
