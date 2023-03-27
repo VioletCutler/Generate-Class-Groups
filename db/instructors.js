@@ -22,24 +22,46 @@ async function createInstructor({ username, password, isAdmin }) {
 }
 
 async function getStudentsByInstructor(id) {
-  const { rows } = await client.query(`
-        SELECT * FROM "students"
-        WHERE "instructorId"=${id};
-    `);
-  return rows;
+  try {
+    const { rows } = await client.query(`
+    SELECT * FROM "students"
+    WHERE "instructorId"=${id};
+`);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getInstructorByUsername(username) {
+  try {
+    console.log('getInstructorByUsername', username)
+    const { rows: [instructor] } = await client.query(`
+      SELECT id, username, "isAdmin"
+      FROM "instructors"
+      WHERE username = $1;
+    `, [username])
+
+    if (instructor){
+      instructor.students = await getStudentsByInstructor(instructor.id)
+      return instructor
+    } else {
+      return undefined
+    }
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function getAllInstructors() {
   try {
-    console.log('get all instructors')
     const { rows } = await client.query(`
         SELECT id, username, "isAdmin"
         FROM "instructors"
       `);
-    console.log('ALL INSTRUCTORS', rows)
-    // for (let instructor of rows) {
-    //   instructor.students = await getStudentsByInstructor(instructor.id);
-    // }
+    for (let instructor of rows) {
+      instructor.students = await getStudentsByInstructor(instructor.id);
+    }
     return rows;
   } catch (error) {
     throw error;
@@ -49,4 +71,5 @@ async function getAllInstructors() {
 module.exports = {
   createInstructor,
   getAllInstructors,
+  getInstructorByUsername
 };

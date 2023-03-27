@@ -1,6 +1,9 @@
 const Express = require('express');
 const router = Express.Router();
 const { client } = require('../db/client')
+require('dotenv').config()
+const { JWT_SECRET } = process.env
+
 
 router.use('*', (req, res, next)=> {
     console.log('a request is being made to the API router')
@@ -20,10 +23,16 @@ router.use('/health', async (req, res, next)=>{
     }
 })
 
-router.use(async(req, res, next)=> {
-    console.log('authorization middleware')
-    next()
-})
+// router.use(async(req, res, next)=> {
+//     console.log('authorization middleware')
+//     const auth = req.headers('Authorization')
+//     const prefix = 'Bearer '
+//     if (auth) {
+//         const token = auth.slice(prefix)
+//         const isValidToken = jwt.verify(token, JWT_SECRET)
+//     }
+//     next()
+// })
 
 const instructorsRouter = require('./instructors')
 router.use('/instructors', instructorsRouter)
