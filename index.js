@@ -3,6 +3,8 @@ const morgan = require('morgan')
 const Express = require("express");
 const app = Express();
 const PORT = 1337
+const apiErrorHandler = require('./api/error/api-error-handler')
+const ApiError = require('./api/error/ApiError')
 
 app.use(morgan('dev'))
 app.use(Express.json())
@@ -18,15 +20,17 @@ const apiRouter = require('./api')
 app.use('/api', apiRouter)
 
 
+
+
+// app.use((error, req, res, next)=> {
+//     console.log('Error', error)
+//     res.send({error: error.message, name: error.name, message: error.message, table: error.table})
+// })
+
 app.get('*', (req, res, next)=>{  
-    res.status(404).send({error: '404 - Not Found', message: 'No route found for the requested URL'})
+    next(ApiError.pageNotFound('Page Not Found'))
 })
-
-app.use((error, req, res, next)=> {
-    console.log('Error', error)
-    res.send({error: error.message, name: error.name, message: error.message, table: error.table})
-})
-
+app.use(apiErrorHandler)
 client.connect()
 
 app.listen(PORT, ()=>{

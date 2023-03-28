@@ -10,11 +10,12 @@ const requireAuthorization = require('./utils')
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { JWT_SECRET } = process.env;
+const ApiError = require('./error/ApiError')
 
-instructorsRouter.use((req, res, next) => {
-  console.log("A request has been made to /instructors");
-  next();
-});
+// instructorsRouter.use((req, res, next) => {
+//   console.log("A request has been made to /instructors");
+//   next();
+// });
 
 instructorsRouter.get("/", requireAuthorization, async (req, res) => {
   try {
@@ -25,16 +26,13 @@ instructorsRouter.get("/", requireAuthorization, async (req, res) => {
   }
 });
 
-instructorsRouter.post("/register", async (req, res) => {
+instructorsRouter.post("/register", async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const _user = await getInstructorByUsername(username);
     if (_user) {
-      res.status(400).send({
-        success: false,
-        error: 'UserExistsError',
-        message: "A user by that username already exists",
-      });
+      next(ApiError.badRequest("A user by that username already exists"))
+      return;
     } else {
       const newUser = await createInstructor({
         username,
@@ -47,7 +45,7 @@ instructorsRouter.post("/register", async (req, res) => {
         },
         JWT_SECRET
       );
-      res.send({
+      res.status(201).send({
         success: true,
         message: "Thank you for signing up",
         token,
@@ -70,7 +68,7 @@ instructorsRouter.post("/login", async (req, res) => {
       });
     } else {
         const token = jwt.sign({id: user.id, username: user.username}, JWT_SECRET)
-      res.send({
+      res.status(202).send({
         user,
         token
       });
