@@ -4,9 +4,10 @@ const {
   getAllInstructors,
   getInstructorByUsername,
   createInstructor,
-  getInstructor,
+  getInstructor
 } = require("../db");
-const JWT = require("jsonwebtoken");
+const requireAuthorization = require('./utils')
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { JWT_SECRET } = process.env;
 
@@ -15,7 +16,7 @@ instructorsRouter.use((req, res, next) => {
   next();
 });
 
-instructorsRouter.get("/", async (req, res) => {
+instructorsRouter.get("/", requireAuthorization, async (req, res) => {
   try {
     const instructors = await getAllInstructors();
     res.send({ success: true, instructors });
@@ -29,7 +30,7 @@ instructorsRouter.post("/register", async (req, res) => {
     const { username, password } = req.body;
     const _user = await getInstructorByUsername(username);
     if (_user) {
-      res.send({
+      res.status(400).send({
         success: false,
         error: 'UserExistsError',
         message: "A user by that username already exists",
@@ -39,7 +40,7 @@ instructorsRouter.post("/register", async (req, res) => {
         username,
         password,
       });
-      const token = JWT.sign(
+      const token = jwt.sign(
         {
           id: newUser.id,
           username: newUser.name,
@@ -62,13 +63,17 @@ instructorsRouter.post("/login", async (req, res) => {
     const { username, password } = req.body;
     const user = await getInstructor({ username, password });
     if (!user) {
-      res.send({
+      res.status(400).send({
         success: false,
         name: "IncorrectCredentialsError",
         message: "Username or password is incorrect",
       });
     } else {
-      res.send(user);
+        const token = jwt.sign({id: user.id, username: user.username}, JWT_SECRET)
+      res.send({
+        user,
+        token
+      });
     }
   } catch (error) {
     throw error;

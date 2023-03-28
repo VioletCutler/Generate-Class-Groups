@@ -3,6 +3,8 @@ const router = Express.Router();
 const { client } = require('../db/client')
 require('dotenv').config()
 const { JWT_SECRET } = process.env
+const jwt = require('jsonwebtoken')
+const { getInstructorById } = require('../db')
 
 
 router.use('*', (req, res, next)=> {
@@ -23,16 +25,27 @@ router.use('/health', async (req, res, next)=>{
     }
 })
 
-// router.use(async(req, res, next)=> {
-//     console.log('authorization middleware')
-//     const auth = req.headers('Authorization')
-//     const prefix = 'Bearer '
-//     if (auth) {
-//         const token = auth.slice(prefix)
-//         const isValidToken = jwt.verify(token, JWT_SECRET)
-//     }
-//     next()
-// })
+router.use(async(req, res, next)=> {
+    const auth = req.header('Authorization')
+    console.log('Auth :', auth)
+    try {
+        const prefix = 'Bearer '
+        if (auth) {
+            const token = auth.slice(prefix)
+            const { id } = jwt.verify(token, JWT_SECRET)
+            if(!id){
+                next()
+            } else {
+                const instructor = await getInstructorById(id)
+                req.instructor = instructor
+                next()
+            }
+        }
+        next()
+    } catch(error){
+        throw error
+    }
+})
 
 const instructorsRouter = require('./instructors')
 router.use('/instructors', instructorsRouter)

@@ -87,9 +87,23 @@ async function getAllInstructors() {
   }
 }
 
+async function getInstructorById(id){
+  try{
+    const { rows: [instructor] } = await client.query(`
+        SELECT id, username, "isAdmin"
+        FROM "instructors"
+        WHERE id=$1
+    `, [id])
+    return instructor
+  } catch(error){
+    throw error
+  }
+}
+
 module.exports = {
   createInstructor,
   getAllInstructors,
   getInstructor,
   getInstructorByUsername,
+  getInstructorById
 };
