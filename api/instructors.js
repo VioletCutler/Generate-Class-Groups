@@ -1,6 +1,11 @@
 const Express = require("express");
 const instructorsRouter = Express.Router();
-const { getAllInstructors, getInstructorByUsername, createInstructor } = require("../db");
+const {
+  getAllInstructors,
+  getInstructorByUsername,
+  createInstructor,
+  getInstructor,
+} = require("../db");
 const JWT = require("jsonwebtoken");
 require("dotenv").config();
 const { JWT_SECRET } = process.env;
@@ -26,6 +31,7 @@ instructorsRouter.post("/register", async (req, res) => {
     if (_user) {
       res.send({
         success: false,
+        error: 'UserExistsError',
         message: "A user by that username already exists",
       });
     } else {
@@ -45,6 +51,24 @@ instructorsRouter.post("/register", async (req, res) => {
         message: "Thank you for signing up",
         token,
       });
+    }
+  } catch (error) {
+    throw error;
+  }
+});
+
+instructorsRouter.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = await getInstructor({ username, password });
+    if (!user) {
+      res.send({
+        success: false,
+        name: "IncorrectCredentialsError",
+        message: "Username or password is incorrect",
+      });
+    } else {
+      res.send(user);
     }
   } catch (error) {
     throw error;

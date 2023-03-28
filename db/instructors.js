@@ -21,6 +21,21 @@ async function createInstructor({ username, password, isAdmin }) {
   }
 }
 
+async function getInstructor({ username, password }) {
+ 
+  if (!username || !password) return;
+  try {
+    const instructor = await getInstructorByUsername(username);
+    if (!instructor) return;
+    const hashedPassword = instructor.password
+    const passwordsMatch = await bcrypt.compare(password, hashedPassword);
+    if (!passwordsMatch) return;
+    return instructor;
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function getStudentsByInstructor(id) {
   try {
     const { rows } = await client.query(`
@@ -35,18 +50,22 @@ async function getStudentsByInstructor(id) {
 
 async function getInstructorByUsername(username) {
   try {
-    console.log('getInstructorByUsername', username)
-    const { rows: [instructor] } = await client.query(`
-      SELECT id, username, "isAdmin"
+    const {
+      rows: [instructor],
+    } = await client.query(
+      `
+      SELECT *
       FROM "instructors"
       WHERE username = $1;
-    `, [username])
+    `,
+      [username]
+    );
 
-    if (instructor){
-      instructor.students = await getStudentsByInstructor(instructor.id)
-      return instructor
+    if (instructor) {
+      instructor.students = await getStudentsByInstructor(instructor.id);
+      return instructor;
     } else {
-      return undefined
+      return undefined;
     }
   } catch (error) {
     throw error;
@@ -71,5 +90,6 @@ async function getAllInstructors() {
 module.exports = {
   createInstructor,
   getAllInstructors,
-  getInstructorByUsername
+  getInstructor,
+  getInstructorByUsername,
 };
