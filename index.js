@@ -19,17 +19,10 @@ app.use((req, res, next)=>{
 const apiRouter = require('./api')
 app.use('/api', apiRouter)
 
-
-
-
-// app.use((error, req, res, next)=> {
-//     console.log('Error', error)
-//     res.send({error: error.message, name: error.name, message: error.message, table: error.table})
-// })
-
 app.get('*', (req, res, next)=>{  
     next(ApiError.pageNotFound('Page Not Found'))
 })
+
 app.use(apiErrorHandler)
 client.connect()
 

@@ -12,17 +12,21 @@ require("dotenv").config();
 const { JWT_SECRET } = process.env;
 const ApiError = require('./error/ApiError')
 
-// instructorsRouter.use((req, res, next) => {
-//   console.log("A request has been made to /instructors");
-//   next();
-// });
+instructorsRouter.use((req, res, next) => {
+  console.log("A request has been made to /instructors");
+  next();
+});
+
+
 
 instructorsRouter.get("/", requireAuthorization, async (req, res) => {
   try {
     const instructors = await getAllInstructors();
+    console.log('Instructors:', instructors)
     res.send({ success: true, instructors });
+    return;
   } catch (error) {
-    res.send(error);
+    throw error;
   }
 });
 
@@ -45,7 +49,7 @@ instructorsRouter.post("/register", async (req, res, next) => {
         },
         JWT_SECRET
       );
-      res.status(201).send({
+      res.send({
         success: true,
         message: "Thank you for signing up",
         token,
@@ -56,19 +60,16 @@ instructorsRouter.post("/register", async (req, res, next) => {
   }
 });
 
-instructorsRouter.post("/login", async (req, res) => {
+instructorsRouter.post("/login", async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const user = await getInstructor({ username, password });
     if (!user) {
-      res.status(400).send({
-        success: false,
-        name: "IncorrectCredentialsError",
-        message: "Username or password is incorrect",
-      });
+      next(ApiError.badRequest('Username or password is incorrect'))
+      return;
     } else {
         const token = jwt.sign({id: user.id, username: user.username}, JWT_SECRET)
-      res.status(202).send({
+      res.send({
         user,
         token
       });

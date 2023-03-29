@@ -38,14 +38,25 @@ router.use(async(req, res, next)=> {
                 req.instructor = instructor
                 next()
             }
+        } else {
+            next()
         }
-        next()
     } catch(error){
         throw error
     }
 })
 
+router.get('/user', (req, res, next)=>{
+    try{
+    res.send({success: true})
+    } catch (error){
+        next(error)
+    }
+  
+})
 const instructorsRouter = require('./instructors')
 router.use('/instructors', instructorsRouter)
+const studentsRouter = require('./students')
+router.use('/students', studentsRouter)
 
 module.exports = router
