@@ -30,17 +30,20 @@ const newInstructors = [
   {
     username: 'Admin',
     password: '12345678',
-    isAdmin: true
+    isAdmin: true,
+    email: "AdminUser@gmail.com"
   },
   {
     username: 'Test User 1',
     password: '12345678',
-    isAdmin: false
+    isAdmin: false,
+    email: "TestUser1@gmail.com"
   },
   {
     username: 'Test User 2',
     password: '12345678',
-    isAdmin: false
+    isAdmin: false,
+    email: "TestUser2@gmail.com"
   }
 ]
 

@@ -32,7 +32,7 @@ instructorsRouter.get("/", requireAuthorization, async (req, res) => {
 
 instructorsRouter.post("/register", async (req, res, next) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, isAdmin, email } = req.body;
     const _user = await getInstructorByUsername(username);
     if (_user) {
       next(ApiError.badRequest("A user by that username already exists"))
@@ -41,6 +41,7 @@ instructorsRouter.post("/register", async (req, res, next) => {
       const newUser = await createInstructor({
         username,
         password,
+        email
       });
       const token = jwt.sign(
         {

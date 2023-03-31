@@ -2,18 +2,19 @@ const { client } = require("./client");
 const bcrypt = require("bcrypt");
 const SALT_COUNT = 10;
 
-async function createInstructor({ username, password, isAdmin }) {
+async function createInstructor({ username, password, isAdmin = false, email }) {
   const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
+  const hashedEmail = await bcrypt.hash(email, SALT_COUNT)
   try {
     const {
       rows: [user],
     } = await client.query(
       `
-        INSERT INTO instructors(username, password, "isAdmin") VALUES ($1, $2, $3)
+        INSERT INTO instructors(username, password, "isAdmin", email) VALUES ($1, $2, $3, $4)
         ON CONFLICT (username) DO NOTHING 
         RETURNING id, username, "isAdmin"
       `,
-      [username, hashedPassword, isAdmin]
+      [username, hashedPassword, isAdmin, hashedEmail]
     );
     return user;
   } catch (error) {
@@ -38,10 +39,12 @@ async function getInstructor({ username, password }) {
 
 async function getStudentsByInstructor(id) {
   try {
+    console.log('getStudentsByInstructor:',id)
     const { rows } = await client.query(`
     SELECT * FROM "students"
     WHERE "instructorId"=${id};
 `);
+    console.log(rows)
     return rows;
   } catch (error) {
     throw error;
@@ -105,5 +108,6 @@ module.exports = {
   getAllInstructors,
   getInstructor,
   getInstructorByUsername,
-  getInstructorById
+  getInstructorById,
+  getStudentsByInstructor
 };

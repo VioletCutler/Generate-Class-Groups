@@ -59,10 +59,18 @@ async function getAllStudents() {
   }
 }
 
+async function getStudentById(id){
+  const { rows: [student]} = await client.query(`
+    SELECT * FROM students
+    WHERE id=${id};
+  `)
+  return student
+}
 
 
 module.exports = {
   createStudent,
   updateStudent,
-  getAllStudents, 
+  getAllStudents,
+  getStudentById 
 };

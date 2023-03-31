@@ -37,11 +37,11 @@ const helperObj = {
   
   function createGroupsObject(studentList, groupSize) {
   // This section needs to be reworked. It is a stopgap to prevent the 'pickRandomStudent()' from running an infinite loop. However, it will sort of mess up the intended groups sizes if the groups size is supposed to be 3
-    if (studentList.length === groupSize - 1) {
+    if (studentList.length === groupSize) {
       placeGroupInRoom(studentList);
       return helperObj;
     }
-    if (studentList.length < groupSize - 1){
+    if (studentList.length < groupSize){
       addStudentsToPreexistingGroups(studentList)
       return helperObj;
     }
