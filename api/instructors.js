@@ -9,7 +9,7 @@ const {
 const requireAuthorization = require('./utils')
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, JWT_EXPIRES_IN } = process.env;
 const ApiError = require('./error/ApiError')
 
 instructorsRouter.use((req, res, next) => {
@@ -48,7 +48,10 @@ instructorsRouter.post("/register", async (req, res, next) => {
           id: newUser.id,
           username: newUser.name,
         },
-        JWT_SECRET
+        JWT_SECRET,
+        {
+        expiresIn: JWT_EXPIRES_IN
+        }
       );
       res.send({
         success: true,

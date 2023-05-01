@@ -1,16 +1,16 @@
 const { client } = require("./client");
 
-async function createStudent({ name, classroom, instructorId }) {
+async function createStudent({ name}) {
   try {
     const {
       rows: [newStudent],
     } = await client.query(
       `
-            INSERT INTO "students"(name, classroom, "instructorId")
-            VALUES ($1, $2, $3)
+            INSERT INTO "students"(name)
+            VALUES ($1)
             RETURNING *
         `,
-      [name, classroom, instructorId]
+      [name]
     );
     return newStudent;
   } catch (error) {

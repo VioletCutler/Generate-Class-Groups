@@ -1,11 +1,24 @@
-const { createInstructor, createStudent, getAllStudents, updateStudent, getAllInstructors } = require("./");
-const { newInstructors, newStudents } = require("../src/dummyData/dummyData");
+const {
+  createInstructor,
+  createStudent,
+  getAllStudents,
+  updateStudent,
+  getAllInstructors,
+} = require("./");
+const {
+  seedInstructors,
+  seedStudents,
+  seedClassrooms,
+} = require("./seedData.js");
 const { client } = require("./client");
 
 async function dropTables() {
   try {
     console.log("starting to drop tables...");
     await client.query(`
+            DROP TABLE IF EXISTS "classEnrollment";
+            DROP TABLE IF EXISTS "instructorsClasses";
+            DROP TABLE IF EXISTS "classrooms";
             DROP TABLE IF EXISTS "students";
             DROP TABLE IF EXISTS "instructors";
         `);
@@ -28,9 +41,24 @@ async function createTables() {
             );
             CREATE TABLE "students" (
                 id SERIAL PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                classroom VARCHAR(255) NOT NULL,
-                "instructorId" INTEGER REFERENCES instructors(id)
+                name VARCHAR(255) NOT NULL
+                );
+                CREATE TABLE "classrooms" (
+                  id SERIAL PRIMARY KEY,
+                  name VARCHAR(255) UNIQUE NOT NULL,
+                  "inSession" BOOLEAN default FALSE
+                );
+                CREATE TABLE "instructorsClasses" (
+                  id SERIAL PRIMARY KEY,
+                  "instructorId" INTEGER REFERENCES instructors(id),
+                  "classroomId" INTEGER REFERENCES classrooms(id),
+                  UNIQUE ("instructorId", "classroomId")
+                );
+                CREATE TABLE "classEnrollment" (
+                  id SERIAL PRIMARY KEY,
+                  "classroomId" INTEGER REFERENCES classrooms(id),
+                  "studentId" INTEGER REFERENCES students(id),
+                  UNIQUE ("studentId", "classroomId")
                 );
         `);
     console.log("...finished creating tables");
@@ -47,10 +75,10 @@ async function buildDatabase() {
     await dropTables();
     await createTables();
     await Promise.all(
-      newInstructors.map((newUser) => createInstructor(newUser))
+      seedInstructors.map((newUser) => createInstructor(newUser))
     );
     await Promise.all(
-      newStudents.map((newStudent) => createStudent(newStudent))
+      seedStudents.map((newStudent) => createStudent(newStudent))
     );
 
     console.log("...finished building database");
@@ -61,18 +89,13 @@ async function buildDatabase() {
 
 async function testDB() {
   try {
-    console.log("beginning to test db");
-    const allStudents = await getAllStudents()
-    console.log('All Students:', allStudents)
-
-    const updatedStudent = await updateStudent(allStudents[0].id, {name: 'Handsome Bob'})
-    console.log(updatedStudent)
-
-    const allInstructors = await getAllInstructors()
-    console.log('All Instructors:', allInstructors)
-
-
-
+    // console.log("beginning to test db");
+    // const allStudents = await getAllStudents()
+    // console.log('All Students:', allStudents)
+    // const updatedStudent = await updateStudent(allStudents[0].id, {name: 'Handsome Bob'})
+    // console.log(updatedStudent)
+    // const allInstructors = await getAllInstructors()
+    // console.log('All Instructors:', allInstructors)
   } catch (error) {
     throw error;
   }
