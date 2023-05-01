@@ -325,10 +325,21 @@ const seedClassrooms = [
   },
 ];
 
-const seedClassEnrollments = [{}];
+function createSeedClassEnrollments(classRooms, studentList){
+    const seedClassEnrollments = []
+    for (let i = 0; i < seedStudents.length; i++){
+        seedClassEnrollments.push({
+            classroomId: Math.floor(Math.random(0, 1) * seedClassrooms.length),
+            instructorId: Math.floor(Math.random(0, 1) * seedInstructors.length)
+        })
+    }
+    return seedClassEnrollments;
+}
+
 
 module.exports = {
   seedInstructors,
   seedStudents,
   seedClassrooms,
+  createSeedClassEnrollments
 };

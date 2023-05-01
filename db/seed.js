@@ -9,6 +9,7 @@ const {
   seedInstructors,
   seedStudents,
   seedClassrooms,
+  createSeedClassEnrollments
 } = require("./seedData.js");
 const { client } = require("./client");
 
@@ -80,7 +81,7 @@ async function buildDatabase() {
     await Promise.all(
       seedStudents.map((newStudent) => createStudent(newStudent))
     );
-
+    console.log('Creating Class Enrollments: ', createSeedClassEnrollments(seedStudents, seedInstructors))
     console.log("...finished building database");
   } catch (error) {
     console.log(error);
