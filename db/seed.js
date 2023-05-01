@@ -4,6 +4,8 @@ const {
   getAllStudents,
   updateStudent,
   getAllInstructors,
+  createNewClassroom,
+  enrollStudent
 } = require("./");
 const {
   seedInstructors,
@@ -75,13 +77,27 @@ async function buildDatabase() {
     console.log("beginning to build database...");
     await dropTables();
     await createTables();
+
+    console.log('creating instructors...')
     await Promise.all(
       seedInstructors.map((newUser) => createInstructor(newUser))
     );
+    console.log('...finished creating instructors')
+    console.log('creating students...')
     await Promise.all(
       seedStudents.map((newStudent) => createStudent(newStudent))
     );
-    console.log('Creating Class Enrollments: ', createSeedClassEnrollments(seedStudents, seedInstructors))
+    console.log('...finished creating students')
+    console.log('creating classrooms...')
+      await Promise.all(
+        seedClassrooms.map((newClassroom) => createNewClassroom(newClassroom))
+      )
+      console.log('...finished creating classrooms')
+      console.log("enrolling students...")
+      const seedEnrollments = createSeedClassEnrollments(seedStudents, seedInstructors)
+      await Promise.all(seedEnrollments.map((seedEnrollment) => enrollStudent(seedEnrollment)))
+      console.log('...finished enrolling students')
+   
     console.log("...finished building database");
   } catch (error) {
     console.log(error);

@@ -1,4 +1,5 @@
 module.exports = {
-    ...require('./instructors'),
-    ...require('./students')
+    ...require('./database_functions/instructors'),
+    ...require('./database_functions/students'),
+    ...require('./database_functions/classrooms')
 }
