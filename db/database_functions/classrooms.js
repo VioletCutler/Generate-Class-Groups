@@ -66,12 +66,12 @@ async function addInstructorToClass({ classroomId, instructorId }) {
       rows: [instructorsClass],
     } = await client.query(
       `
-          INSERT INTO "instructorsClasses"
+          INSERT INTO "instructorsClasses"("instructorId", "classroomId")
           VALUES ($1, $2)
-          ON CONFLICT ("classroomId", "instructorId") DO NOTHING
+          ON CONFLICT ("instructorId", "classroomId") DO NOTHING
           RETURNING *;
       `,
-      [classroomId, instructorId]
+      [instructorId, classroomId,]
     );
 
     return instructorsClass;
@@ -121,6 +121,18 @@ async function getClassroomById({id}){
     }
 }
 
+// ========== These are related to the query above ^ ==================
+// Get Instructors by Classroom Id
+// async function getInstructorsByClass({id}){
+//     const { rows } = await client.query(`
+
+//     `)
+// }
+
+// Get All Students by ClassroomId
+
+//================================================================
+
 // Get Classrooms by Instructor
 async function getClassroomsByInstructor({instructorId}){
     try {
@@ -137,17 +149,9 @@ async function getClassroomsByInstructor({instructorId}){
 }
 
 
-// Get Classroom by Id
 
 
-// Get Instructors by Classroom Id
-// async function getInstructorsByClass({id}){
-//     const { rows } = await client.query(`
 
-//     `)
-// }
-
-// Get All Students by Class
 
 // Update Classroom
 

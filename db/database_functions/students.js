@@ -71,8 +71,6 @@ async function getStudentById(id){
   return student
 }
 
-// Get Student by Name
-
 // Delete student
 
 module.exports = {

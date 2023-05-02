@@ -325,21 +325,53 @@ const seedClassrooms = [
   },
 ];
 
-function createSeedClassEnrollments(classRooms, studentList){
+
+function createSeedClassEnrollments(studentList){
     const seedClassEnrollments = []
-    for (let i = 1; i < seedStudents.length; i++){
-        seedClassEnrollments.push({
-            classroomId: Math.ceil(Math.random(0, 1) * seedClassrooms.length),
-            studentId: Math.ceil(Math.random(0, 1) * seedInstructors.length)
-        })
+    
+    const studentsAlreadyPicked = []
+    for (let i = 0; i < studentList.length; i++){
+      let randomStudentIndex = Math.ceil(Math.random(0, 1) * studentList.length)
+      while (studentsAlreadyPicked.includes(randomStudentIndex)){
+        randomStudentIndex = Math.ceil(Math.random(0, 1) * studentList.length)
+      }
+      studentsAlreadyPicked.push(randomStudentIndex)
+
+      seedClassEnrollments.push({
+          classroomId: Math.ceil(Math.random(0, 1) * seedClassrooms.length),
+          studentId: randomStudentIndex
+      })
+
     }
     return seedClassEnrollments;
 }
 
+function createSeedInstructorAssignments(instructorsList){
+  const seedClassAssignments = []
+    
+  const instructorsAlreadyPicked = []
+    for (let i = 0; i < instructorsList.length; i++){
+      let randomInstructorIndex = Math.ceil(Math.random(0, 1) * instructorsList.length)
+      while (instructorsAlreadyPicked.includes(randomInstructorIndex)){
+        randomInstructorIndex = Math.ceil(Math.random(0, 1) * instructorsList.length)
+      }
+      instructorsAlreadyPicked.push(randomInstructorIndex)
+
+      seedClassAssignments.push({
+          classroomId: Math.ceil(Math.random(0, 1) * seedClassrooms.length),
+          instructorId: randomInstructorIndex
+      })
+
+    }
+    console.log('Class Assignments :', seedClassAssignments)
+
+    return seedClassAssignments;
+}
 
 module.exports = {
   seedInstructors,
   seedStudents,
   seedClassrooms,
-  createSeedClassEnrollments
+  createSeedClassEnrollments,
+  createSeedInstructorAssignments
 };

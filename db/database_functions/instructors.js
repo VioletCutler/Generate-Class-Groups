@@ -87,9 +87,7 @@ async function getAllInstructors() {
         SELECT id, username, "isAdmin"
         FROM "instructors"
       `);
-    for (let instructor of rows) {
-      instructor.students = await getStudentsByInstructor(instructor.id);
-    }
+
     return rows;
   } catch (error) {
     throw error;
