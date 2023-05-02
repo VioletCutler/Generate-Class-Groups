@@ -327,7 +327,7 @@ const seedClassrooms = [
 
 function createSeedClassEnrollments(classRooms, studentList){
     const seedClassEnrollments = []
-    for (let i = 0; i < seedStudents.length; i++){
+    for (let i = 1; i < seedStudents.length; i++){
         seedClassEnrollments.push({
             classroomId: Math.ceil(Math.random(0, 1) * seedClassrooms.length),
             studentId: Math.ceil(Math.random(0, 1) * seedInstructors.length)

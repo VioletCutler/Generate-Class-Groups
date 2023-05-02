@@ -1,5 +1,6 @@
 const { client } = require("../client");
 
+// Create Student
 async function createStudent({ name}) {
   try {
     const {
@@ -18,6 +19,7 @@ async function createStudent({ name}) {
   }
 }
 
+// Update Student
 async function updateStudent(id, fields = {}) {
   const setString = Object.keys(fields)
     .map((key, index) => `"${key}"=$${index + 1}`)
@@ -47,6 +49,7 @@ async function updateStudent(id, fields = {}) {
   }
 }
 
+// Get All Students
 async function getAllStudents() {
   try {
     const { rows } = await client.query(`
@@ -59,6 +62,7 @@ async function getAllStudents() {
   }
 }
 
+// Get Student by Id
 async function getStudentById(id){
   const { rows: [student]} = await client.query(`
     SELECT * FROM students
@@ -67,6 +71,9 @@ async function getStudentById(id){
   return student
 }
 
+// Get Student by Name
+
+// Delete student
 
 module.exports = {
   createStudent,

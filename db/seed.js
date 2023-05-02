@@ -5,7 +5,9 @@ const {
   updateStudent,
   getAllInstructors,
   createNewClassroom,
-  enrollStudent
+  enrollStudent,
+  deactivateAccount,
+  updateInstructor
 } = require("./");
 const {
   seedInstructors,
@@ -40,7 +42,8 @@ async function createTables() {
                 username VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL, 
                 "isAdmin" BOOLEAN DEFAULT false,
-                email VARCHAR(255) UNIQUE NOT NULL 
+                email VARCHAR(255) UNIQUE NOT NULL,
+                "isActive" BOOLEAN DEFAULT true 
             );
             CREATE TABLE "students" (
                 id SERIAL PRIMARY KEY,
@@ -106,13 +109,20 @@ async function buildDatabase() {
 
 async function testDB() {
   try {
-    // console.log("beginning to test db");
+    console.log("beginning to test database...");
+
+    await deactivateAccount({id: 1})
+
+    console.log('Beginning to associate instructors with classrooms...')
+    
+
     // const allStudents = await getAllStudents()
     // console.log('All Students:', allStudents)
     // const updatedStudent = await updateStudent(allStudents[0].id, {name: 'Handsome Bob'})
     // console.log(updatedStudent)
     // const allInstructors = await getAllInstructors()
     // console.log('All Instructors:', allInstructors)
+    console.log('...finished testing database')
   } catch (error) {
     throw error;
   }
