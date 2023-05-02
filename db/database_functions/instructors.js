@@ -14,7 +14,7 @@ async function createInstructor({ username, password, isAdmin = false, email, is
       `
         INSERT INTO instructors(username, password, "isAdmin", email, "isActive") VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT (username) DO NOTHING 
-        RETURNING id, username, "isAdmin"
+        RETURNING id, username, "isAdmin", "isActive"
       `,
       [username, hashedPassword, isAdmin, hashedEmail, isActive]
     );

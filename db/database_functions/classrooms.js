@@ -1,7 +1,7 @@
 const { client } = require("../client.js");
 
 // Create New Classroom
-async function createNewClassroom({ name, inSession }) {
+async function createNewClassroom({ name, inSession = true}) {
   try {
     const {
       rows: [newClass],
@@ -41,17 +41,17 @@ async function enrollStudent({ classroomId, studentId }) {
 }
 
 // Unenroll Student [delete from classEnrollment]
-async function unenrollStudent({ classroomId, studentId }) {
+async function unenrollStudent({studentId }) {
   try {
     const {
       rows: [unenrolledStudent],
     } = await client.query(
       `
         DELETE FROM "classEnrollment"
-        WHERE "classroomId"=$1 AND "studentId"=$2
+        WHERE "studentId"=$1
         RETURNING *;
     `,
-      [classroomId, studentId]
+      [studentId]
     );
     return unenrolledStudent;
   } catch (error) {
@@ -134,14 +134,14 @@ async function getClassroomById({id}){
 //================================================================
 
 // Get Classrooms by Instructor
-async function getClassroomsByInstructor({instructorId}){
+async function getClassroomsByInstructorId({instructorId}){
     try {
         const { rows } = await client.query(`
         SELECT "instructorsClasses".*, classrooms.*
         FROM "instructorsClasses"
-        WHERE "instructorId"=$1
-        JOIN classrooms ON "classroomId"=classrooms.id;
-    `)
+        JOIN classrooms ON "classroomId"=classrooms.id
+        WHERE "instructorId"=$1;
+    `, [instructorId])
     return rows;
     } catch (error) {
         throw error;
@@ -161,6 +161,7 @@ module.exports = {
   unenrollStudent,
   addInstructorToClass,
   removeInstructorFromClass,
+  getClassroomsByInstructorId
 };
 
 /*

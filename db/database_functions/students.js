@@ -1,7 +1,7 @@
 const { client } = require("../client");
-
+const { unenrollStudent } = require('./classrooms')
 // Create Student
-async function createStudent({ name}) {
+async function createStudent({name}) {
   try {
     const {
       rows: [newStudent],
@@ -72,10 +72,34 @@ async function getStudentById(id){
 }
 
 // Delete student
+async function deleteStudent({id}){
+  try {
+   
+    // first unenroll student
+    await unenrollStudent({studentId: id})
+    console.log('successfully unenrolled')
+    console.log('Delete Student Id :', id)
+    // then delete student from database
+    const { rows: [deletedStudent] } = await client.query(`
+    DELETE FROM students
+    WHERE id=$1
+    RETURNING *;
+  `, [id])
+
+  return deletedStudent;
+  } catch (error) {
+    
+  }
+
+ 
+}
+
+
 
 module.exports = {
   createStudent,
   updateStudent,
   getAllStudents,
-  getStudentById 
+  getStudentById,
+  deleteStudent
 };

@@ -10,7 +10,9 @@ const {
   updateInstructor,
   getInstructorById,
   getStudentById,
-  addInstructorToClass
+  addInstructorToClass,
+  getClassroomsByInstructorId,
+  deleteStudent
 } = require("./");
 const {
   createSeedInstructorAssignments,
@@ -129,20 +131,14 @@ async function testDB() {
   try {
     console.log("beginning to test database...");
 
-    /*
-    Cases to test:
+    /* ======================================================= //
+    Cases left to test:
  
- 
-
-
-  
-
     - Get all classrooms with their instructors and students all attached
       - [An array of classroom objects with instructors and students attached as 
         additional arrays]
 
     - Get classrooms by Instructor
-
 
     - Change enrollment for a list of students from one class to another
 
@@ -150,9 +146,6 @@ async function testDB() {
 
     - Delete an instructors account
 
-    - Delete a student from the database
-      - remove their association with a classroom
-      - delete them from the students table
     */
 
     // Get all instructors
@@ -183,14 +176,43 @@ async function testDB() {
     selectedStudentArray.push(await getStudentById(85));
     console.log("Selected students :", selectedStudentArray);
 
-    // await deactivateAccount({id: 1})
 
-    // const allStudents = await getAllStudents()
-    // console.log('All Students:', allStudents)
-    // const updatedStudent = await updateStudent(allStudents[0].id, {name: 'Handsome Bob'})
-    // console.log(updatedStudent)
-    // const allInstructors = await getAllInstructors()
-    // console.log('All Instructors:', allInstructors)
+    // Test Case #1 ================================== //
+
+    //create new user
+    const jenny = await createInstructor({username:'jenny99', email:'jenny99@gmail.com', password:'12345678'})
+    console.log('new instructor :', jenny)
+
+    //create new classroom
+    const jennysClassroom = await createNewClassroom({name: 'Jenny\'s Classroom', inSession: false})
+
+    //assign Jenny to the new classroom
+    const jennysClassroomAssigment = await addInstructorToClass({classroomId: jennysClassroom.id, instructorId: jenny.id})
+    
+    // create new students
+    const newStudentArray = [
+      'Bobby C.',
+      'Jared R',
+      'Ramona I.',
+      'Perry S',
+      'Mecca W.',
+      'Reggie W.',
+      'Tariq R',
+      'Jess G.',
+      'Katy C.'
+    ]
+
+    const newStudents = await Promise.all(newStudentArray.map((student) => createStudent({name: student})))
+    console.log('New Students :', newStudents)
+    const newlyEnrolledStudents = await Promise.all(newStudents.map((student) => enrollStudent({classroomId: jennysClassroom.id, studentId: student.id})))
+
+    console.log('Jenny\'s Classroom :', jennysClassroom)
+    console.log('Jenny\'s Classroom Enrollment :', newlyEnrolledStudents)
+
+    console.log('Delete Student Bobby C. {id 201}...')
+    const deletedBobbyC = await deleteStudent({id: newStudents[0].id})
+    console.log('Deleted Bobby C:', deletedBobbyC)
+
     console.log("...finished testing database");
   } catch (error) {
     throw error;
