@@ -91,28 +91,33 @@ async function buildDatabase() {
   try {
     client.connect();
 
-    console.log("beginning to build database...");
+    //Build Database
+    console.log("//=================== Beginning to Build Database ===============//");
     await dropTables();
     await createTables();
 
+    //Create Instructors
     console.log("creating instructors...");
     await Promise.all(
       seedInstructors.map((newUser) => createInstructor(newUser))
     );
     console.log("...finished creating instructors");
 
+    //Create Students
     console.log("creating students...");
     await Promise.all(
       seedStudents.map((newStudent) => createStudent(newStudent))
     );
     console.log("...finished creating students");
 
+    //Create Classrooms
     console.log("creating classrooms...");
     await Promise.all(
       seedClassrooms.map((newClassroom) => createNewClassroom(newClassroom))
     );
     console.log("...finished creating classrooms");
 
+    //Assign Instructors
     console.log("assigning instructors...");
     const seedAssignments = createSeedInstructorAssignments(seedInstructors);
     await Promise.all(
@@ -122,6 +127,7 @@ async function buildDatabase() {
     );
     console.log("...finished enrolling students");
 
+    //Enroll Students
     console.log("enrolling students...");
     const seedEnrollments = createSeedClassEnrollments(seedStudents);
     await Promise.all(
@@ -129,9 +135,7 @@ async function buildDatabase() {
     );
     console.log("...finished enrolling students");
 
-    // - Associate instructors with classes
-
-    console.log("...finished building database");
+    console.log("//===============Finished Building Database===============//");
   } catch (error) {
     console.log(error);
   }
@@ -140,23 +144,6 @@ async function buildDatabase() {
 async function testDB() {
   try {
     console.log("//============= Begin testDB ==================// ");
-
-    /* ======================================================= //
-    Cases left to test:
- 
-    - Get all classrooms with their instructors and students all attached
-      - [An array of classroom objects with instructors and students attached as 
-        additional arrays]
-
-    - Get classrooms by Instructor
-
-    - Change enrollment for a list of students from one class to another
-
-    - Deactive an instructors account
-
-    - Delete an instructors account
-
-    */
 
     // Get all instructors
     const instructors = await getAllInstructors();
@@ -311,7 +298,42 @@ async function testCase1(){
       const jennysUpdatedClassroom = await updateClassroom(jennysClassroom.id, {name: 'Jenny\'s Updated Classroom', inSession: true})
       console.log('Jenny\'s Updated Classroom :', jennysUpdatedClassroom)
 
+
+   
+
     console.log('//=============== End Test Case 1 ==============//')
+  } catch (error) {
+    throw error
+  }
+}
+
+async function testCase2(){
+  try {
+    console.log('//============== Begin Test Case 2 =================//')
+   /* ======================================================= //
+    Test Case 2 Goals:
+    - Create New Instructor
+    - Assign to Multiple Pre-existing Classes
+    - Get classrooms by Instructor
+    - Change enrollment for a list of students from one class to another
+    - Deactive an instructors account
+    - Delete an instructors account
+    */
+    //Create new instructor
+    const newInstructor = await createInstructor({name: 'Johnny', username: 'Johnny99', password: '12345678', email: "Johnny99@gmail.com"})
+    console.log('New Instructor :', newInstructor)
+
+    //Assign to Multiple Pre-existing Classes
+    console.log('Adding Johnny to Multiple Classrooms...')
+    const allClassrooms = await getAllClassrooms();
+    await addInstructorToClass({classroomId: allClassrooms[0].id, instructorId: newInstructor.id})
+    await addInstructorToClass({classroomId: allClassrooms[5].id, instructorId: newInstructor.id})
+    await addInstructorToClass({classroomId: allClassrooms[allClassrooms.length - 1].id, instructorId: newInstructor.id})
+    const johnnysClassrooms = await getClassroomsByInstructorId({instructorId: newInstructor.id})
+    console.log('Johnny\'s Classrooms :', johnnysClassrooms)
+
+    console.log('//=============== End Test Case 2 ====================//')
+
   } catch (error) {
     throw error
   }
@@ -320,5 +342,6 @@ async function testCase1(){
 buildDatabase()
   .then(testDB)
   .then(testCase1)
+  .then(testCase2)
   .catch(console.error)
   .finally(() => client.end());
