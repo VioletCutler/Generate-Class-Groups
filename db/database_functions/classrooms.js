@@ -102,15 +102,18 @@ async function removeInstructorFromClass({ classroomId, instructorId }) {
 
 // Get Classroom by Id
 async function getClassroomById({ id }) {
-  // Grab the classroom as well as the instructors and students
   try {
-
-    const {rows: [classroom]} = await client.query(`
-      SELECT classrooms.name
+    const {
+      rows: [classroom],
+    } = await client.query(
+      `
+      SELECT classrooms.name, classrooms.id
       FROM "classrooms"
       WHERE id=$1;
-    `, [id])
-    // get students
+    `,
+      [id]
+    );
+
     const students = await client.query(
       `
         SELECT classrooms.*, "classEnrollment".*,  students.name
@@ -122,19 +125,22 @@ async function getClassroomById({ id }) {
       [id]
     );
 
-    const instructors = await client.query(`
+    const instructors = await client.query(
+      `
     SELECT instructors.name, instructors.username
     FROM "classrooms"
     JOIN "instructorsClasses" on "instructorsClasses"."classroomId" = classrooms.id
     JOIN "instructors" on "instructorsClasses"."instructorId" = instructors.id
     WHERE classrooms.id=$1;
-    `, [id])
+    `,
+      [id]
+    );
 
     const classRoom = {
       classroom: classroom,
       instructors: instructors.rows,
-      students: students.rows
-    }
+      students: students.rows,
+    };
 
     return classRoom;
   } catch (error) {
@@ -147,6 +153,23 @@ async function getClassroomById({ id }) {
 // async function getInstructorsByClass({id}){
 //     const { rows } = await client.query(`
 
+async function getInstructorsByClassroomId({id}){
+  try {
+    console.log(id)
+    const { rows } = await client.query(`
+      SELECT instructors.*
+      FROM "classrooms"
+      JOIN "instructorsClasses" ON "instructorsClasses"."classroomId" = "classrooms".id
+      JOIN instructors ON "instructorsClasses"."instructorId" = "instructors".id
+      WHERE "classrooms".id=$1;
+    `, [id])
+
+      return rows
+  } catch (error) {
+    throw error
+  }
+
+}
 //     `)
 // }
 
@@ -182,6 +205,7 @@ module.exports = {
   removeInstructorFromClass,
   getClassroomById,
   getClassroomsByInstructorId,
+  getInstructorsByClassroomId
 };
 
 /*

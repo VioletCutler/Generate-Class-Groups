@@ -1,0 +1,7 @@
+ SELECT classrooms.*, "instructorsClasses".*, "classEnrollment".*, instructors.name AS "instructorName", instructors.username AS "instructorName", students.name
+        FROM "classrooms"
+        JOIN "instructorsClasses" on "instructorsClasses"."classroomId" = classrooms.id
+        JOIN "classEnrollment" on "classEnrollment"."classroomId" = classrooms.id
+        JOIN "instructors" on "instructorsClasses"."instructorId" = instructors.id
+        JOIN "students" on "classEnrollment"."studentId" = students.id
+        WHERE classrooms.id=2;
