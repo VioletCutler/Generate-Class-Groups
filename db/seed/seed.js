@@ -13,7 +13,7 @@ const {
   addInstructorToClass,
   getClassroomsByInstructorId,
   deleteStudent
-} = require("./");
+} = require("..");
 const {
   createSeedInstructorAssignments,
   seedInstructors,
@@ -21,7 +21,7 @@ const {
   seedClassrooms,
   createSeedClassEnrollments,
 } = require("./seedData.js");
-const { client } = require("./client");
+const { client } = require("../client");
 
 async function dropTables() {
   try {
