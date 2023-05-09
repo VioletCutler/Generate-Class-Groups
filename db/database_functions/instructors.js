@@ -161,12 +161,16 @@ async function deactivateAccount({id}){
  Delete instructor permanently */
 async function deleteInstructor({instructorId}){
   try {
+
+    // Grab a list of classrooms associated with this instructor
     const { rows: [classrooms] } = await client.query(`
     SELECT "instructorsClasses".*, classrooms.*
     FROM "instructorsClasses"
     JOIN classrooms ON "classroomId"=classrooms.id
     WHERE "instructorId"=$1;
     `, [id])
+
+    console.log('Delete Instructor')
   } catch (error) {
     throw error
   }

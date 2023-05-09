@@ -116,7 +116,7 @@ async function getClassroomById({ id }) {
 
     const students = await client.query(
       `
-        SELECT classrooms.*, "classEnrollment".*,  students.name
+        SELECT "classEnrollment".*,  students.name
         FROM "classrooms"
         JOIN "classEnrollment" on "classEnrollment"."classroomId" = classrooms.id
         JOIN "students" on "classEnrollment"."studentId" = students.id
@@ -216,6 +216,9 @@ async function updateClassroom(id, fields = {}) {
 
   if (setString.length === 0) return;
 
+  console.log('Update Classroom line 219')
+  console.log('Fields :', fields)
+  console.log('Set String :', setString)
   try {
     const {
       rows: [classroom],

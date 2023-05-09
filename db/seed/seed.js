@@ -19,6 +19,7 @@ const {
   getAllClassrooms,
   getAllClassroomsWithInstructorsAndStudents,
   getAllInSessionClassrooms,
+  updateClassroom
 } = require("..");
 const {
   createSeedInstructorAssignments,
@@ -138,7 +139,7 @@ async function buildDatabase() {
 
 async function testDB() {
   try {
-    console.log("beginning to test database...");
+    console.log("//============= Begin testDB ==================// ");
 
     /* ======================================================= //
     Cases left to test:
@@ -185,7 +186,45 @@ async function testDB() {
     selectedStudentArray.push(await getStudentById(85));
     console.log("Selected students :", selectedStudentArray);
 
-    // Test Case #1 ================================== //
+    console.log("Getting all classrooms...");
+    const allClassrooms = await getAllClassrooms();
+    console.log("All Classrooms :", allClassrooms);
+
+    console.log(
+      "Getting all classrooms with students and instructors attached..."
+    );
+    const allClassroomsWithInstructorsAndStudents =
+      await getAllClassroomsWithInstructorsAndStudents();
+    console.log(
+      "All classrooms with instructors and students :",
+      allClassroomsWithInstructorsAndStudents
+    );
+    console.log("First Classroom", allClassroomsWithInstructorsAndStudents[0]);
+    console.log(
+      "Last Classroom",
+      allClassroomsWithInstructorsAndStudents[
+        allClassroomsWithInstructorsAndStudents.length - 1
+      ]
+    );
+
+    console.log("All In Session Classrooms", await getAllInSessionClassrooms());
+    console.log("//================ End testDb ======================//");
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function testCase1(){
+  try {
+    console.log('//======================== Begin testCase1 ================//')
+    /*
+    Test Case 1 Contents:
+      - create new user
+      - create new classroom
+      - assign Jenny to the new classroom
+      - create new students
+    */
+
 
     //create new user
     const jenny = await createInstructor({
@@ -236,65 +275,50 @@ async function testDB() {
 
     console.log("Jenny's Initialized Classroom :", jennysClassroom);
     console.log("Jenny's Classroom Enrollment :", newlyEnrolledStudents);
+    console.log("Jenny's Classroom w/ Students enrolled:", await getClassroomById({id: jennysClassroom.id}))
 
     console.log("Delete Student Bobby C. {id 201}...");
     const deletedBobbyC = await deleteStudent({ id: newStudents[0].id });
     console.log("Deleted Bobby C:", deletedBobbyC);
 
     console.log("Getting Jenny's full class...");
-    const jennysClassWithStudents = await getClassroomById({
+    const jennysClassroomWithInstructorAndStudents = await getClassroomById({
       id: jennysClassroom.id,
     });
     console.log(
       "Jenny's Classroom with Instructor and Students :",
-      jennysClassWithStudents
+      jennysClassroomWithInstructorAndStudents
     );
 
     console.log("Adding instructor to Jenny's classroom ..");
+    const instructors = await getAllInstructors()
     await addInstructorToClass({
       classroomId: jennysClassroom.id,
       instructorId: instructors[0].id,
     });
 
     console.log(
-      "Getting Instructors by Classroom Id :",
+      "Getting Instructors in Jenny's Classroom :",
       await getInstructorsByClassroomId({ id: jennysClassroom.id })
     );
 
     console.log(
-      "Getting Students by Classroom Id :",
+      "Getting Students by Jenny's Classroom Id :",
       await getStudentsByClassroomId({ id: jennysClassroom.id })
     );
 
-    console.log("Getting all classrooms...");
-    const allClassrooms = await getAllClassrooms();
-    console.log("All Classrooms :", allClassrooms);
+      console.log('Updating Jenny\'s Classroom...')
+      const jennysUpdatedClassroom = await updateClassroom(jennysClassroom.id, {name: 'Jenny\'s Updated Classroom', inSession: true})
+      console.log('Jenny\'s Updated Classroom :', jennysUpdatedClassroom)
 
-    console.log(
-      "Getting all classrooms with students and instructors attached..."
-    );
-    const allClassroomsWithInstructorsAndStudents =
-      await getAllClassroomsWithInstructorsAndStudents();
-    console.log(
-      "All classrooms with instructors and students :",
-      allClassroomsWithInstructorsAndStudents
-    );
-    console.log("First Classroom", allClassroomsWithInstructorsAndStudents[0]);
-    console.log(
-      "Last Classroom",
-      allClassroomsWithInstructorsAndStudents[
-        allClassroomsWithInstructorsAndStudents.length - 1
-      ]
-    );
-
-    console.log("All In Session Classrooms", await getAllInSessionClassrooms());
-    console.log("...finished testing database");
+    console.log('//=============== End Test Case 1 ==============//')
   } catch (error) {
-    throw error;
+    throw error
   }
 }
 
 buildDatabase()
   .then(testDB)
+  .then(testCase1)
   .catch(console.error)
   .finally(() => client.end());
