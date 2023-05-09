@@ -1,7 +1,7 @@
 const { client } = require("../client.js");
 
 // Create New Classroom
-async function createNewClassroom({ name, inSession = true}) {
+async function createNewClassroom({ name, inSession = true }) {
   try {
     const {
       rows: [newClass],
@@ -41,7 +41,7 @@ async function enrollStudent({ classroomId, studentId }) {
 }
 
 // Unenroll Student [delete from classEnrollment]
-async function unenrollStudent({studentId }) {
+async function unenrollStudent({ studentId }) {
   try {
     const {
       rows: [unenrolledStudent],
@@ -71,7 +71,7 @@ async function addInstructorToClass({ classroomId, instructorId }) {
           ON CONFLICT ("instructorId", "classroomId") DO NOTHING
           RETURNING *;
       `,
-      [instructorId, classroomId,]
+      [instructorId, classroomId]
     );
 
     return instructorsClass;
@@ -101,24 +101,45 @@ async function removeInstructorFromClass({ classroomId, instructorId }) {
 }
 
 // Get Classroom by Id
-async function getClassroomById({id}){
-    // Grab the classroom as well as the instructors and students
-    try {
-        const { rows: [classroom] } = await client.query(`
-        SELECT classrooms.*. instructors.
+async function getClassroomById({ id }) {
+  // Grab the classroom as well as the instructors and students
+  try {
+
+    const {rows: [classroom]} = await client.query(`
+      SELECT classrooms.name
+      FROM "classrooms"
+      WHERE id=$1;
+    `, [id])
+    // get students
+    const students = await client.query(
+      `
+        SELECT classrooms.*, "classEnrollment".*,  students.name
         FROM "classrooms"
-        WHERE id=$1;
-        `, [id])
+        JOIN "classEnrollment" on "classEnrollment"."classroomId" = classrooms.id
+        JOIN "students" on "classEnrollment"."studentId" = students.id
+        WHERE classrooms.id=$1;
+        `,
+      [id]
+    );
 
+    const instructors = await client.query(`
+    SELECT instructors.name, instructors.username
+    FROM "classrooms"
+    JOIN "instructorsClasses" on "instructorsClasses"."classroomId" = classrooms.id
+    JOIN "instructors" on "instructorsClasses"."instructorId" = instructors.id
+    WHERE classrooms.id=$1;
+    `, [id])
 
-        // Either a large join statement above 
-        // or attach instructors and students to the classroom 
-
-
-        return classroom;
-    } catch (error) {
-        throw error;
+    const classRoom = {
+      classroom: classroom,
+      instructors: instructors.rows,
+      students: students.rows
     }
+
+    return classRoom;
+  } catch (error) {
+    throw error;
+  }
 }
 
 // ========== These are related to the query above ^ ==================
@@ -134,24 +155,22 @@ async function getClassroomById({id}){
 //================================================================
 
 // Get Classrooms by Instructor
-async function getClassroomsByInstructorId({instructorId}){
-    try {
-        const { rows } = await client.query(`
+async function getClassroomsByInstructorId({ instructorId }) {
+  try {
+    const { rows } = await client.query(
+      `
         SELECT "instructorsClasses".*, classrooms.*
         FROM "instructorsClasses"
         JOIN classrooms ON "classroomId"=classrooms.id
         WHERE "instructorId"=$1;
-    `, [instructorId])
+    `,
+      [instructorId]
+    );
     return rows;
-    } catch (error) {
-        throw error;
-    }
+  } catch (error) {
+    throw error;
+  }
 }
-
-
-
-
-
 
 // Update Classroom
 
@@ -161,7 +180,8 @@ module.exports = {
   unenrollStudent,
   addInstructorToClass,
   removeInstructorFromClass,
-  getClassroomsByInstructorId
+  getClassroomById,
+  getClassroomsByInstructorId,
 };
 
 /*

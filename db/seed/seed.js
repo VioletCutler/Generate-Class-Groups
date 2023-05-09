@@ -12,7 +12,8 @@ const {
   getStudentById,
   addInstructorToClass,
   getClassroomsByInstructorId,
-  deleteStudent
+  deleteStudent,
+  getClassroomById
 } = require("..");
 const {
   createSeedInstructorAssignments,
@@ -45,7 +46,7 @@ async function createTables() {
     await client.query(`
             CREATE TABLE "instructors" (
                 id SERIAL PRIMARY KEY,
-                name VARCHAR(255) UNIQUE NOT NULL,
+                name VARCHAR(255) NOT NULL,
                 username VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL, 
                 "isAdmin" BOOLEAN DEFAULT false,
@@ -207,12 +208,17 @@ async function testDB() {
     console.log('New Students :', newStudents)
     const newlyEnrolledStudents = await Promise.all(newStudents.map((student) => enrollStudent({classroomId: jennysClassroom.id, studentId: student.id})))
 
-    console.log('Jenny\'s Classroom :', jennysClassroom)
+    console.log('Jenny\'s Initialized Classroom :', jennysClassroom)
     console.log('Jenny\'s Classroom Enrollment :', newlyEnrolledStudents)
 
     console.log('Delete Student Bobby C. {id 201}...')
     const deletedBobbyC = await deleteStudent({id: newStudents[0].id})
     console.log('Deleted Bobby C:', deletedBobbyC)
+
+
+    console.log('Getting Jenny\'s full class...')
+    const jennysClassWithStudents = await getClassroomById({id: jennysClassroom.id})
+    console.log('Jenny\'s Classroom with Instructor and Students :', jennysClassWithStudents)
 
     console.log("...finished testing database");
   } catch (error) {
