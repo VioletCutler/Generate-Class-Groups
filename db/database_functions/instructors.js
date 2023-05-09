@@ -124,7 +124,7 @@ async function updateInstructor(id, fields = {}) {
     
     const { rows: [instructor] } = await client.query(
       `
-            UPDATE instructor
+            UPDATE instructors
             SET ${setString}
             WHERE id=${id}
             RETURNING *;

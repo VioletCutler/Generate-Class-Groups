@@ -148,11 +148,7 @@ async function getClassroomById({ id }) {
   }
 }
 
-// ========== These are related to the query above ^ ==================
-// Get Instructors by Classroom Id
-// async function getInstructorsByClass({id}){
-//     const { rows } = await client.query(`
-
+// Get instructors by classroom Id
 async function getInstructorsByClassroomId({id}){
   try {
     console.log(id)
@@ -168,14 +164,23 @@ async function getInstructorsByClassroomId({id}){
   } catch (error) {
     throw error
   }
-
 }
-//     `)
-// }
 
-// Get All Students by ClassroomId
-
-//================================================================
+// Get students by classroom Id
+async function getStudentsByClassroomId({id}){
+  try {
+    const { rows } = await client.query(`
+      SELECT students.* 
+      FROM "classrooms"
+      JOIN "classEnrollment" ON "classEnrollment"."classroomId" = "classrooms".id
+      JOIN students ON "classEnrollment"."studentId" = "students".id
+      WHERE "classrooms".id = $1;
+    `, [id])
+    return rows
+  } catch (error) {
+    throw error
+  }
+}
 
 // Get Classrooms by Instructor
 async function getClassroomsByInstructorId({ instructorId }) {
@@ -196,6 +201,32 @@ async function getClassroomsByInstructorId({ instructorId }) {
 }
 
 // Update Classroom
+async function updateClassroom(id, fields = {}){
+  const setString = Object.keys(fields)
+  .map((key, index) => {
+    return `"${key}"=$${index + 1}`})
+    .join(", ");
+  
+    if (setString.length === 0) return
+
+    try{
+      const { rows: [ classroom ]} = await client.query(
+        `
+        UPDATE classrooms
+        SET ${setString}
+        WHERE id=${id}
+        RETURNING *;
+        `, Object.values(fields)
+      )
+
+      return classroom
+    } catch (error){
+      throw error
+    }
+}
+
+
+
 
 module.exports = {
   createNewClassroom,
@@ -205,12 +236,8 @@ module.exports = {
   removeInstructorFromClass,
   getClassroomById,
   getClassroomsByInstructorId,
-  getInstructorsByClassroomId
+  getInstructorsByClassroomId,
+  getStudentsByClassroomId,
+  updateClassroom
 };
 
-/*
-INSERT INTO instructors(username, password, "isAdmin", email) VALUES ($1, $2, $3, $4)
-ON CONFLICT (username) DO NOTHING 
-RETURNING id, username, "isAdmin"
-
-*/

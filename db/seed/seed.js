@@ -14,7 +14,8 @@ const {
   getClassroomsByInstructorId,
   deleteStudent,
   getClassroomById,
-  getInstructorsByClassroomId
+  getInstructorsByClassroomId,
+  getStudentsByClassroomId
 } = require("..");
 const {
   createSeedInstructorAssignments,
@@ -225,7 +226,10 @@ async function testDB() {
 
     console.log('Adding instructor to Jenny\'s classroom ..')
     await addInstructorToClass({classroomId: jennysClassroom.id, instructorId: instructors[0].id})
+
     console.log('Getting Instructors by Classroom Id :', await getInstructorsByClassroomId({id: jennysClassroom.id}))
+
+    console.log('Getting Students by Classroom Id :', await getStudentsByClassroomId({id: jennysClassroom.id}))
 
     console.log("...finished testing database");
   } catch (error) {
