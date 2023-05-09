@@ -45,6 +45,7 @@ async function createTables() {
     await client.query(`
             CREATE TABLE "instructors" (
                 id SERIAL PRIMARY KEY,
+                name VARCHAR(255) UNIQUE NOT NULL,
                 username VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL, 
                 "isAdmin" BOOLEAN DEFAULT false,
@@ -180,7 +181,7 @@ async function testDB() {
     // Test Case #1 ================================== //
 
     //create new user
-    const jenny = await createInstructor({username:'jenny99', email:'jenny99@gmail.com', password:'12345678'})
+    const jenny = await createInstructor({name: 'Jenny', username:'jenny99', email:'jenny99@gmail.com', password:'12345678'})
     console.log('new instructor :', jenny)
 
     //create new classroom

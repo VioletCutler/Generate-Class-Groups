@@ -4,7 +4,7 @@ const SALT_COUNT = 10;
 
 // Create Instructor
 
-async function createInstructor({ username, password, isAdmin = false, email, isActive = true }) {
+async function createInstructor({ name, username, password, isAdmin = false, email, isActive = true }) {
   const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
   const hashedEmail = await bcrypt.hash(email, SALT_COUNT)
   try {
@@ -12,11 +12,11 @@ async function createInstructor({ username, password, isAdmin = false, email, is
       rows: [user],
     } = await client.query(
       `
-        INSERT INTO instructors(username, password, "isAdmin", email, "isActive") VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO instructors(name, username, password, "isAdmin", email, "isActive") VALUES ($1, $2, $3, $4, $5, $6)
         ON CONFLICT (username) DO NOTHING 
-        RETURNING id, username, "isAdmin", "isActive"
+        RETURNING id, name, username, "isAdmin", "isActive"
       `,
-      [username, hashedPassword, isAdmin, hashedEmail, isActive]
+      [name, username, hashedPassword, isAdmin, hashedEmail, isActive]
     );
     return user;
   } catch (error) {

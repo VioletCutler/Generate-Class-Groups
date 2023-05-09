@@ -105,7 +105,7 @@ async function getClassroomById({id}){
     // Grab the classroom as well as the instructors and students
     try {
         const { rows: [classroom] } = await client.query(`
-        SELECT *
+        SELECT classrooms.*. instructors.
         FROM "classrooms"
         WHERE id=$1;
         `, [id])
