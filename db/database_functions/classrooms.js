@@ -137,7 +137,7 @@ async function getClassroomById({ id }) {
     );
 
     const classRoom = {
-      classroom: classroom,
+      classroomInfo: classroom,
       instructors: instructors.rows,
       students: students.rows,
     };
@@ -149,36 +149,42 @@ async function getClassroomById({ id }) {
 }
 
 // Get instructors by classroom Id
-async function getInstructorsByClassroomId({id}){
+async function getInstructorsByClassroomId({ id }) {
   try {
-    console.log(id)
-    const { rows } = await client.query(`
+    console.log(id);
+    const { rows } = await client.query(
+      `
       SELECT instructors.*
       FROM "classrooms"
       JOIN "instructorsClasses" ON "instructorsClasses"."classroomId" = "classrooms".id
       JOIN instructors ON "instructorsClasses"."instructorId" = "instructors".id
       WHERE "classrooms".id=$1;
-    `, [id])
+    `,
+      [id]
+    );
 
-      return rows
+    return rows;
   } catch (error) {
-    throw error
+    throw error;
   }
 }
 
 // Get students by classroom Id
-async function getStudentsByClassroomId({id}){
+async function getStudentsByClassroomId({ id }) {
   try {
-    const { rows } = await client.query(`
+    const { rows } = await client.query(
+      `
       SELECT students.* 
       FROM "classrooms"
       JOIN "classEnrollment" ON "classEnrollment"."classroomId" = "classrooms".id
       JOIN students ON "classEnrollment"."studentId" = "students".id
       WHERE "classrooms".id = $1;
-    `, [id])
-    return rows
+    `,
+      [id]
+    );
+    return rows;
   } catch (error) {
-    throw error
+    throw error;
   }
 }
 
@@ -201,32 +207,74 @@ async function getClassroomsByInstructorId({ instructorId }) {
 }
 
 // Update Classroom
-async function updateClassroom(id, fields = {}){
+async function updateClassroom(id, fields = {}) {
   const setString = Object.keys(fields)
-  .map((key, index) => {
-    return `"${key}"=$${index + 1}`})
+    .map((key, index) => {
+      return `"${key}"=$${index + 1}`;
+    })
     .join(", ");
-  
-    if (setString.length === 0) return
 
-    try{
-      const { rows: [ classroom ]} = await client.query(
-        `
+  if (setString.length === 0) return;
+
+  try {
+    const {
+      rows: [classroom],
+    } = await client.query(
+      `
         UPDATE classrooms
         SET ${setString}
         WHERE id=${id}
         RETURNING *;
-        `, Object.values(fields)
-      )
+        `,
+      Object.values(fields)
+    );
 
-      return classroom
-    } catch (error){
-      throw error
-    }
+    return classroom;
+  } catch (error) {
+    throw error;
+  }
 }
 
+async function getAllClassrooms() {
+  try {
+    const { rows } = await client.query(`
+      SELECT *
+      FROM classrooms
+    `);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
 
+async function getAllClassroomsWithInstructorsAndStudents() {
+  try {
+    const { rows } = await client.query(`
+      SELECT *
+      FROM classrooms
+    `);
+    return await Promise.all(
+      rows.map((classroom) => getClassroomById({ id: classroom.id }))
+    );
+  } catch (error) {
+    throw error;
+  }
+}
 
+async function getAllInSessionClassrooms() {
+  try {
+    const { rows } = await client.query(`
+      SELECT *
+      FROM classrooms
+      WHERE "inSession" = true;
+    `);
+    return Promise.all(
+      rows.map((classroom) => getClassroomById({ id: classroom.id }))
+    );
+  } catch (error) {
+    throw error;
+  }
+}
 
 module.exports = {
   createNewClassroom,
@@ -238,6 +286,8 @@ module.exports = {
   getClassroomsByInstructorId,
   getInstructorsByClassroomId,
   getStudentsByClassroomId,
-  updateClassroom
+  updateClassroom,
+  getAllClassrooms,
+  getAllClassroomsWithInstructorsAndStudents,
+  getAllInSessionClassrooms,
 };
-

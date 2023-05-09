@@ -158,7 +158,22 @@ async function deactivateAccount({id}){
 
 
 /*
- Delete instructor permanently 
+ Delete instructor permanently */
+async function deleteInstructor({instructorId}){
+  try {
+    const { rows: [classrooms] } = await client.query(`
+    SELECT "instructorsClasses".*, classrooms.*
+    FROM "instructorsClasses"
+    JOIN classrooms ON "classroomId"=classrooms.id
+    WHERE "instructorId"=$1;
+    `, [id])
+  } catch (error) {
+    throw error
+  }
+}
+
+
+ /*
   -- Grab a list of classrooms associated with this instructor
   -- Check to see if there are any other instructors associated with each of those classrooms
       -- If yes, then don't delete the classroom or the associated students, just delete
@@ -175,5 +190,6 @@ module.exports = {
   getInstructorById,
   getStudentsByInstructor,
   deactivateAccount,
-  updateInstructor
+  updateInstructor,
+  deleteInstructor
 };

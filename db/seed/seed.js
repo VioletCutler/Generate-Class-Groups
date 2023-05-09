@@ -15,7 +15,10 @@ const {
   deleteStudent,
   getClassroomById,
   getInstructorsByClassroomId,
-  getStudentsByClassroomId
+  getStudentsByClassroomId,
+  getAllClassrooms,
+  getAllClassroomsWithInstructorsAndStudents,
+  getAllInSessionClassrooms,
 } = require("..");
 const {
   createSeedInstructorAssignments,
@@ -112,7 +115,9 @@ async function buildDatabase() {
     console.log("assigning instructors...");
     const seedAssignments = createSeedInstructorAssignments(seedInstructors);
     await Promise.all(
-      seedAssignments.map((seedAssignment) => addInstructorToClass(seedAssignment))
+      seedAssignments.map((seedAssignment) =>
+        addInstructorToClass(seedAssignment)
+      )
     );
     console.log("...finished enrolling students");
 
@@ -180,57 +185,109 @@ async function testDB() {
     selectedStudentArray.push(await getStudentById(85));
     console.log("Selected students :", selectedStudentArray);
 
- 
-
     // Test Case #1 ================================== //
 
     //create new user
-    const jenny = await createInstructor({name: 'Jenny', username:'jenny99', email:'jenny99@gmail.com', password:'12345678'})
-    console.log('new instructor :', jenny)
+    const jenny = await createInstructor({
+      name: "Jenny",
+      username: "jenny99",
+      email: "jenny99@gmail.com",
+      password: "12345678",
+    });
+    console.log("new instructor :", jenny);
 
     //create new classroom
-    const jennysClassroom = await createNewClassroom({name: 'Jenny\'s Classroom', inSession: false})
+    const jennysClassroom = await createNewClassroom({
+      name: "Jenny's Classroom",
+      inSession: false,
+    });
 
     //assign Jenny to the new classroom
-    const jennysClassroomAssigment = await addInstructorToClass({classroomId: jennysClassroom.id, instructorId: jenny.id})
-    
+    const jennysClassroomAssigment = await addInstructorToClass({
+      classroomId: jennysClassroom.id,
+      instructorId: jenny.id,
+    });
+
     // create new students
     const newStudentArray = [
-      'Bobby C.',
-      'Jared R',
-      'Ramona I.',
-      'Perry S',
-      'Mecca W.',
-      'Reggie W.',
-      'Tariq R',
-      'Jess G.',
-      'Katy C.'
-    ]
+      "Bobby C.",
+      "Jared R",
+      "Ramona I.",
+      "Perry S",
+      "Mecca W.",
+      "Reggie W.",
+      "Tariq R",
+      "Jess G.",
+      "Katy C.",
+    ];
 
-    const newStudents = await Promise.all(newStudentArray.map((student) => createStudent({name: student})))
-    console.log('New Students :', newStudents)
-    const newlyEnrolledStudents = await Promise.all(newStudents.map((student) => enrollStudent({classroomId: jennysClassroom.id, studentId: student.id})))
+    const newStudents = await Promise.all(
+      newStudentArray.map((student) => createStudent({ name: student }))
+    );
+    console.log("New Students :", newStudents);
+    const newlyEnrolledStudents = await Promise.all(
+      newStudents.map((student) =>
+        enrollStudent({
+          classroomId: jennysClassroom.id,
+          studentId: student.id,
+        })
+      )
+    );
 
-    console.log('Jenny\'s Initialized Classroom :', jennysClassroom)
-    console.log('Jenny\'s Classroom Enrollment :', newlyEnrolledStudents)
+    console.log("Jenny's Initialized Classroom :", jennysClassroom);
+    console.log("Jenny's Classroom Enrollment :", newlyEnrolledStudents);
 
-    console.log('Delete Student Bobby C. {id 201}...')
-    const deletedBobbyC = await deleteStudent({id: newStudents[0].id})
-    console.log('Deleted Bobby C:', deletedBobbyC)
+    console.log("Delete Student Bobby C. {id 201}...");
+    const deletedBobbyC = await deleteStudent({ id: newStudents[0].id });
+    console.log("Deleted Bobby C:", deletedBobbyC);
 
+    console.log("Getting Jenny's full class...");
+    const jennysClassWithStudents = await getClassroomById({
+      id: jennysClassroom.id,
+    });
+    console.log(
+      "Jenny's Classroom with Instructor and Students :",
+      jennysClassWithStudents
+    );
 
-    console.log('Getting Jenny\'s full class...')
-    const jennysClassWithStudents = await getClassroomById({id: jennysClassroom.id})
-    console.log('Jenny\'s Classroom with Instructor and Students :', jennysClassWithStudents)
+    console.log("Adding instructor to Jenny's classroom ..");
+    await addInstructorToClass({
+      classroomId: jennysClassroom.id,
+      instructorId: instructors[0].id,
+    });
 
+    console.log(
+      "Getting Instructors by Classroom Id :",
+      await getInstructorsByClassroomId({ id: jennysClassroom.id })
+    );
 
-    console.log('Adding instructor to Jenny\'s classroom ..')
-    await addInstructorToClass({classroomId: jennysClassroom.id, instructorId: instructors[0].id})
+    console.log(
+      "Getting Students by Classroom Id :",
+      await getStudentsByClassroomId({ id: jennysClassroom.id })
+    );
 
-    console.log('Getting Instructors by Classroom Id :', await getInstructorsByClassroomId({id: jennysClassroom.id}))
+    console.log("Getting all classrooms...");
+    const allClassrooms = await getAllClassrooms();
+    console.log("All Classrooms :", allClassrooms);
 
-    console.log('Getting Students by Classroom Id :', await getStudentsByClassroomId({id: jennysClassroom.id}))
+    console.log(
+      "Getting all classrooms with students and instructors attached..."
+    );
+    const allClassroomsWithInstructorsAndStudents =
+      await getAllClassroomsWithInstructorsAndStudents();
+    console.log(
+      "All classrooms with instructors and students :",
+      allClassroomsWithInstructorsAndStudents
+    );
+    console.log("First Classroom", allClassroomsWithInstructorsAndStudents[0]);
+    console.log(
+      "Last Classroom",
+      allClassroomsWithInstructorsAndStudents[
+        allClassroomsWithInstructorsAndStudents.length - 1
+      ]
+    );
 
+    console.log("All In Session Classrooms", await getAllInSessionClassrooms());
     console.log("...finished testing database");
   } catch (error) {
     throw error;
