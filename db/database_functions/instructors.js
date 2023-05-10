@@ -145,9 +145,9 @@ async function deactivateAccount({id}){
   try{
     const { rows: [instructor] } = await client.query(`
         UPDATE instructors
-        SET "isActive"='false'
+        SET "isActive"=false
         WHERE id=$1
-        RETURNING *;
+        RETURNING instructors.id, instructors.name, instructors.username, instructors."isAdmin", instructors."isActive";
     `, [id])
     return instructor
   } catch(error){
@@ -161,7 +161,6 @@ async function deactivateAccount({id}){
  Delete instructor permanently */
 async function deleteInstructor({instructorId}){
   try {
-
     // Grab a list of classrooms associated with this instructor
     const { rows: [classrooms] } = await client.query(`
     SELECT "instructorsClasses".*, classrooms.*

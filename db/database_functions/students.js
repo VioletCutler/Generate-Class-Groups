@@ -1,7 +1,7 @@
 const { client } = require("../client");
-const { unenrollStudent } = require('./classrooms')
+const { unenrollStudent } = require("./classrooms");
 // Create Student
-async function createStudent({name}) {
+async function createStudent({ name }) {
   try {
     const {
       rows: [newStudent],
@@ -29,20 +29,20 @@ async function updateStudent(id, fields = {}) {
   }
 
   try {
-    if (setString.length > 0){
-
-    
-    const { rows: [student] } = await client.query(
-      `
+    if (setString.length > 0) {
+      const {
+        rows: [student],
+      } = await client.query(
+        `
             UPDATE students
             SET ${setString}
             WHERE id=${id}
             RETURNING *;
-        `, 
+        `,
         Object.values(fields)
-    );
-    
-    return student;
+      );
+
+      return student;
     }
   } catch (error) {
     throw error;
@@ -63,43 +63,68 @@ async function getAllStudents() {
 }
 
 // Get Student by Id
-async function getStudentById(id){
-  const { rows: [student]} = await client.query(`
+async function getStudentById({ id }) {
+  try {
+    const {
+      rows: [student],
+    } = await client.query(
+      `
     SELECT * FROM students
-    WHERE id=${id};
-  `)
-  return student
+    WHERE id=$1;
+  `,
+      [id]
+    );
+    return student;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getStudentByName({ name }) {
+  try {
+    const {
+      rows: [student],
+    } = await client.query(
+      `
+      SELECT * FROM students
+      WHERE name=$1;
+    `,
+      [name]
+    );
+    return student;
+  } catch (error) {
+    throw error;
+  }
 }
 
 // Delete student
-async function deleteStudent({id}){
+async function deleteStudent({ id }) {
   try {
-   
     // first unenroll student
-    await unenrollStudent({studentId: id})
-    console.log('successfully unenrolled')
-    console.log('Delete Student Id :', id)
+    await unenrollStudent({ studentId: id });
+    console.log("successfully unenrolled");
+    console.log("Delete Student Id :", id);
     // then delete student from database
-    const { rows: [deletedStudent] } = await client.query(`
+    const {
+      rows: [deletedStudent],
+    } = await client.query(
+      `
     DELETE FROM students
     WHERE id=$1
     RETURNING *;
-  `, [id])
+  `,
+      [id]
+    );
 
-  return deletedStudent;
-  } catch (error) {
-    
-  }
-
- 
+    return deletedStudent;
+  } catch (error) {}
 }
-
-
 
 module.exports = {
   createStudent,
   updateStudent,
   getAllStudents,
   getStudentById,
-  deleteStudent
+  deleteStudent,
+  getStudentByName,
 };
