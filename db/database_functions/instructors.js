@@ -1,6 +1,8 @@
 const { client } = require("../client");
 const bcrypt = require("bcrypt");
 const SALT_COUNT = 10;
+const { deleteStudent } = require('./students.js')
+const { getInstructorsByClassroomId,  getStudentsByClassroomId, getClassroomById, deleteClassroom, removeInstructorFromClass } = require('./classrooms.js')
 
 // Create Instructor
 
@@ -161,22 +163,58 @@ async function deactivateAccount({id}){
  Delete instructor permanently */
 async function deleteInstructor({instructorId}){
   try {
+    // Are you sure you want to delete your account?
+    // Doing so will delete all classrooms and students that are
+    // only associated with your account
+
+
     // Grab a list of classrooms associated with this instructor
-    const { rows: [classrooms] } = await client.query(`
+    const classrooms = await client.query(`
     SELECT "instructorsClasses".*, classrooms.*
     FROM "instructorsClasses"
     JOIN classrooms ON "classroomId"=classrooms.id
     WHERE "instructorId"=$1;
-    `, [id])
+    `, [instructorId])
 
-    console.log('Delete Instructor')
+    await removeInstructorFromClasses({instructorId, classrooms: classrooms.rows})
+
+    const { rows: [instructor]} = await client.query(`
+      DELETE FROM instructors
+      WHERE id=$1
+      RETURNING *;
+    `, [instructorId])
+
+    return instructor
   } catch (error) {
     throw error
   }
 }
 
+async function removeInstructorFromClasses({instructorId, classrooms}){
+  try{
+     await Promise.all(classrooms.map(async (classroom) => {
+      const instructors = await getInstructorsByClassroomId({id: classroom.id})
 
- /*
+      //Delete the association of this instructor with this classroom
+      await removeInstructorFromClass({classroomId: classroom.id, instructorId: instructorId})
+
+      //if there are no other instructors associated with the classroom,
+      //delete the students, then the classroom
+      if (instructors.length === 1){
+        //Delete Students
+        const students = await getStudentsByClassroomId({id: classroom.id});
+        const deletedStudents = await Promise.all(students.map((student) => deleteStudent({id: student.id})))
+
+        //Delete Classroom
+        const deletedClassroom = await deleteClassroom({id: classroom.id})
+      }
+    }))
+  } catch(error){
+    throw error;
+  }
+}
+
+/*
   -- Grab a list of classrooms associated with this instructor
   -- Check to see if there are any other instructors associated with each of those classrooms
       -- If yes, then don't delete the classroom or the associated students, just delete

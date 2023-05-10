@@ -20,6 +20,25 @@ async function createNewClassroom({ name, inSession = true }) {
   }
 }
 
+async function deleteClassroom({ id }) {
+  try {
+    const {
+      rows: [classroom],
+    } = await client.query(
+      `
+      DELETE
+      FROM classrooms
+      WHERE id=$1
+      RETURNING *;
+    `,
+      [id]
+    );
+    return classroom;
+  } catch (error) {
+    throw error;
+  }
+}
+
 // Enroll Student in Class
 async function enrollStudent({ classroomId, studentId }) {
   try {
@@ -87,7 +106,8 @@ async function removeInstructorFromClass({ classroomId, instructorId }) {
       rows: [instructorsClass],
     } = await client.query(
       `
-              DELETE FROM instructorsClasses
+              DELETE  
+              FROM "instructorsClasses"
               WHERE "classroomId"=$1 AND "instructorId"=$2
               RETURNING *;
           `,
@@ -96,6 +116,7 @@ async function removeInstructorFromClass({ classroomId, instructorId }) {
 
     return instructorsClass;
   } catch (error) {
+    console.log("Error");
     throw error;
   }
 }
@@ -216,9 +237,9 @@ async function updateClassroom(id, fields = {}) {
 
   if (setString.length === 0) return;
 
-  console.log('Update Classroom line 219')
-  console.log('Fields :', fields)
-  console.log('Set String :', setString)
+  console.log("Update Classroom line 219");
+  console.log("Fields :", fields);
+  console.log("Set String :", setString);
   try {
     const {
       rows: [classroom],
@@ -293,4 +314,5 @@ module.exports = {
   getAllClassrooms,
   getAllClassroomsWithInstructorsAndStudents,
   getAllInSessionClassrooms,
+  deleteClassroom,
 };

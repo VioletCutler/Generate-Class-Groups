@@ -102,8 +102,6 @@ async function deleteStudent({ id }) {
   try {
     // first unenroll student
     await unenrollStudent({ studentId: id });
-    console.log("successfully unenrolled");
-    console.log("Delete Student Id :", id);
     // then delete student from database
     const {
       rows: [deletedStudent],
@@ -115,7 +113,6 @@ async function deleteStudent({ id }) {
   `,
       [id]
     );
-
     return deletedStudent;
   } catch (error) {}
 }

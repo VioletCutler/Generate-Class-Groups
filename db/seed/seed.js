@@ -21,7 +21,8 @@ const {
   getAllInSessionClassrooms,
   updateClassroom,
   getStudentByName,
-} = require("..");
+  deleteInstructor,
+} = require("../");
 const {
   createSeedInstructorAssignments,
   seedInstructors,
@@ -316,13 +317,11 @@ async function testCase1() {
     });
     console.log("Jenny's Updated Classroom :", jennysUpdatedClassroom);
 
-
-
     // Deactivate Jenny\'s Account
-    console.log('Deactivate Jenny\'s Account...')
-    console.log('Active Jenny :', jenny)
-    const jennyDeactivated = await deactivateAccount({id: jenny.id})
-    console.log('Jenny Deactivated :', jennyDeactivated)
+    console.log("Deactivate Jenny's Account...");
+    console.log("Active Jenny :", jenny);
+    const jennyDeactivated = await deactivateAccount({ id: jenny.id });
+    console.log("Jenny Deactivated :", jennyDeactivated);
 
     console.log("//=============== End Test Case 1 ==============//");
   } catch (error) {
@@ -342,38 +341,79 @@ async function testCase2() {
     - Deactive an instructors account
     - Delete an instructors account
     */
+
     //Create new instructor
-    const newInstructor = await createInstructor({
+    const johnny = await createInstructor({
       name: "Johnny",
       username: "Johnny99",
       password: "12345678",
       email: "Johnny99@gmail.com",
     });
-    console.log("New Instructor :", newInstructor);
+    console.log("New Instructor :", johnny);
 
-    //Assign to Multiple Pre-existing Classes
+    //Create Johnny's Students
+    const newStudentArray = [
+      "Jeffrey C.",
+      "Tony R",
+      "Tabitha I.",
+      "Pat S",
+      "Mica W.",
+      "Ronnie W.",
+      "Tyler R",
+      "Johnathan G.",
+      "Kathryn C.",
+    ];
+
+    //Create Johnny's Classroom
+    const johnnysClassroom = await createNewClassroom({
+      name: "Johnny's Classroom",
+      inSession: false,
+    });
+
+    //Assign Johnny to the new classroom
+    const johnnysClassroomAssigment = await addInstructorToClass({
+      classroomId: johnnysClassroom.id,
+      instructorId: johnny.id,
+    });
+
+    //Enroll Johnny's Students in New Classroom
+    const newStudents = await Promise.all(
+      newStudentArray.map((student) => createStudent({ name: student }))
+    );
+    console.log("New Students :", newStudents);
+    const newlyEnrolledStudents = await Promise.all(
+      newStudents.map((student) =>
+        enrollStudent({
+          classroomId: johnnysClassroom.id,
+          studentId: student.id,
+        })
+      )
+    );
+
+    //Assign Johnny to Multiple Pre-existing Classes
     console.log("Adding Johnny to Multiple Classrooms...");
     const allClassrooms = await getAllClassrooms();
     await addInstructorToClass({
       classroomId: allClassrooms[0].id,
-      instructorId: newInstructor.id,
+      instructorId: johnny.id,
     });
     await addInstructorToClass({
       classroomId: allClassrooms[5].id,
-      instructorId: newInstructor.id,
+      instructorId: johnny.id,
     });
     await addInstructorToClass({
       classroomId: allClassrooms[allClassrooms.length - 1].id,
-      instructorId: newInstructor.id,
+      instructorId: johnny.id,
     });
     const johnnysClassrooms = await getClassroomsByInstructorId({
-      instructorId: newInstructor.id,
+      instructorId: johnny.id,
     });
     console.log("Johnny's Classrooms :", johnnysClassrooms);
 
-
-
     // Delete Johnny\'s Account
+    console.log("Deleting Johnny's Account...");
+    const deletedJohnny = await deleteInstructor({ instructorId: johnny.id });
+    console.log("Deleted Johnny:", deletedJohnny);
 
     console.log("//=============== End Test Case 2 ====================//");
   } catch (error) {
