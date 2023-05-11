@@ -22,8 +22,8 @@ app.use('/api', apiRouter)
 app.get('*', (req, res, next)=>{  
     next(ApiError.pageNotFound('Page Not Found'))
 })
-
 app.use(apiErrorHandler)
+
 client.connect()
 
 app.listen(PORT, ()=>{

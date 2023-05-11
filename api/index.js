@@ -32,12 +32,12 @@ router.use(async (req, res, next) => {
   try {
     const prefix = "Bearer ";
     if (auth) {
-      const token = auth.slice(prefix);
+      const token = auth.slice(prefix.length);
       const { id } = jwt.verify(token, JWT_SECRET);
       if (!id) {
         next();
       } else {
-        const instructor = await getInstructorById(id);
+        const instructor = await getInstructorById({id: id});
         req.instructor = instructor;
         next();
       }
@@ -49,13 +49,6 @@ router.use(async (req, res, next) => {
   }
 });
 
-router.get("/user", (req, res, next) => {
-  try {
-    res.send({ success: true });
-  } catch (error) {
-    next(error);
-  }
-});
 const instructorsRouter = require("./instructors");
 router.use("/instructors", instructorsRouter);
 const studentsRouter = require("./students");

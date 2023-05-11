@@ -27,15 +27,16 @@ async function createInstructor({ name, username, password, isAdmin = false, ema
 }
 
 // Get Instructor
-async function getInstructor({ username, password }) {
+async function loginInstructor({ username, password }) {
  
   if (!username || !password) return;
   try {
-    const instructor = await getInstructorByUsername(username);
+    const instructor = await getInstructorByUsername({username});
     if (!instructor) return;
     const hashedPassword = instructor.password
     const passwordsMatch = await bcrypt.compare(password, hashedPassword);
     if (!passwordsMatch) return;
+    delete instructor.password
     return instructor;
   } catch (error) {
     throw error;
@@ -45,12 +46,14 @@ async function getInstructor({ username, password }) {
 // Get Students by Instructor
 async function getStudentsByInstructor({id}) {
   try {
-    console.log('getStudentsByInstructor:',id)
     const { rows } = await client.query(`
-    SELECT * FROM "students"
-    WHERE "instructorId"=${id};
+    SELECT students.* FROM "students"
+    JOIN "classEnrollment" ON "studentId" = students.id
+    JOIN "classrooms" ON "classEnrollment"."classroomId" = classrooms.id
+    JOIN "instructorsClasses" ON "instructorsClasses"."classroomId" = classrooms.id
+    JOIN instructors ON "instructorId" = instructors.id
+    WHERE instructors.id=${id};
 `);
-    console.log(rows)
     return rows;
   } catch (error) {
     throw error;
@@ -60,25 +63,46 @@ async function getStudentsByInstructor({id}) {
 // Get Instructor by Username
 async function getInstructorByUsername({username}) {
   try {
+    console.log('line 63 instructors')
     const {
       rows: [instructor],
     } = await client.query(
       `
-      SELECT *
+      SELECT instructors.id, instructors.name, instructors.username, instructors."isAdmin", instructors."isActive", instructors.password
       FROM "instructors"
       WHERE username = $1;
     `,
       [username]
     );
-
-    if (instructor) {
-      instructor.students = await getStudentsByInstructor(instructor.id);
-      return instructor;
-    } else {
-      return undefined;
-    }
+      if (instructor){
+        return instructor
+      } else {
+        return undefined
+      }
   } catch (error) {
     throw error;
+  }
+}
+
+async function getInstructorByEmail({email}){
+  try {
+    //This function is currently broken because emails are encrypted
+
+    const {rows: [instructor]} = await client.query(`
+      SELECT * 
+      FROM instructors
+      WHERE email = $1;
+    `,[email])
+
+    console.log('Should not be undefined:',instructor)
+    if (instructor){
+      console.log('Should not be seeing this')
+      return instructor
+    } else {
+      return undefined
+    }
+  } catch (error) {
+    throw error
   }
 }
 
@@ -104,7 +128,11 @@ async function getInstructorById({id}){
         FROM "instructors"
         WHERE id=$1
     `, [id])
-    return instructor
+    if (instructor){
+      return instructor
+    } else {
+      return undefined
+    }
   } catch(error){
     throw error
   }
@@ -158,7 +186,6 @@ async function deactivateAccount({id}){
 }
 
 
-
 /*
  Delete instructor permanently */
 async function deleteInstructor({instructorId}){
@@ -181,10 +208,11 @@ async function deleteInstructor({instructorId}){
     const { rows: [instructor]} = await client.query(`
       DELETE FROM instructors
       WHERE id=$1
-      RETURNING *;
+      RETURNING instructors.name, instructors.username, instructors.email;
     `, [instructorId])
 
-    return instructor
+    return instructor ? instructor : undefined;
+
   } catch (error) {
     throw error
   }
@@ -226,11 +254,12 @@ async function removeInstructorFromClasses({instructorId, classrooms}){
 module.exports = {
   createInstructor,
   getAllInstructors,
-  getInstructor,
+  loginInstructor,
   getInstructorByUsername,
   getInstructorById,
   getStudentsByInstructor,
   deactivateAccount,
   updateInstructor,
-  deleteInstructor
+  deleteInstructor,
+  getInstructorByEmail
 };

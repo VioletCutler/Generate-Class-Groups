@@ -1,6 +1,7 @@
 const Express = require('express')
 const studentsRouter = Express.Router()
 const { getAllStudents, getStudentsByInstructor, updateStudent, getStudentById } = require('../db')
+const {requireAuthorization, requireAdmin} = require('./utils/utils.js')
 const ApiError = require('./error/ApiError')
 
 studentsRouter.use((req, res, next)=>{
@@ -8,7 +9,7 @@ studentsRouter.use((req, res, next)=>{
     next()
 })
 
-studentsRouter.get('/', async(req, res) => {
+studentsRouter.get('/', requireAdmin, async(req, res) => {
     try{
         const students = await getAllStudents()
     res.send({success: true, students})
@@ -17,10 +18,10 @@ studentsRouter.get('/', async(req, res) => {
     }
 })
 
-studentsRouter.get('/:instructorId', async(req, res, next) => {
+studentsRouter.get('/:instructorId',  async(req, res, next) => {
     try{
         const { instructorId } = req.params
-        const students = await getStudentsByInstructor(instructorId)
+        const students = await getStudentsByInstructor({id:instructorId})
     res.send({success: true, students})
     } catch (error){
         console.log(error)
@@ -28,12 +29,12 @@ studentsRouter.get('/:instructorId', async(req, res, next) => {
     }
 })
 
-studentsRouter.patch('/:studentId', async(req, res, next) => {
+studentsRouter.patch('/:studentId', requireAuthorization, async(req, res, next) => {
     try{
         const { studentId } = req.params
         const { name, classroom, instructorsId } = req.body
 
-        const studentToUpdate = await getStudentById(studentId)
+        const studentToUpdate = await getStudentById({id: studentId})
         if (!studentToUpdate){
             next(ApiError.badRequest('No student to update'))
         }
