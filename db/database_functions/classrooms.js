@@ -3,6 +3,7 @@ const { client } = require("../client.js");
 // Create New Classroom
 async function createNewClassroom({ name, inSession = true }) {
   try {
+    console.log('Create New Classroom:', name, inSession)
     const {
       rows: [newClass],
     } = await client.query(
@@ -121,6 +122,24 @@ async function removeInstructorFromClass({ classroomId, instructorId }) {
   }
 }
 
+//Get classroom by name
+async function getClassroomByName({classroomName}){
+  try {
+    const {rows: [classroom]} = await client.query(`
+      SELECT *
+      FROM classrooms
+      WHERE name=$1;
+    `, [classroomName])
+    if (classroom){
+      return classroom;
+    } else {
+      return undefined;
+    }
+  } catch (error) {
+    throw error
+  }
+}
+
 // Get Classroom by Id
 async function getClassroomById({ id }) {
   try {
@@ -212,6 +231,7 @@ async function getStudentsByClassroomId({ id }) {
 // Get Classrooms by Instructor
 async function getClassroomsByInstructorId({ instructorId }) {
   try {
+    console.log('Get Classrooms By Instructor Id [instructorId]:', instructorId)
     const { rows } = await client.query(
       `
         SELECT "instructorsClasses".*, classrooms.*
@@ -221,7 +241,9 @@ async function getClassroomsByInstructorId({ instructorId }) {
     `,
       [instructorId]
     );
-    return rows;
+    const classrooms = await Promise.all(rows.map((classroom) =>getClassroomById({id: classroom.id})))
+    console.log('rows:', rows)
+    return classrooms;
   } catch (error) {
     throw error;
   }
@@ -315,4 +337,5 @@ module.exports = {
   getAllClassroomsWithInstructorsAndStudents,
   getAllInSessionClassrooms,
   deleteClassroom,
+  getClassroomByName
 };

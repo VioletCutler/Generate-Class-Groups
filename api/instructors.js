@@ -7,7 +7,8 @@ const {
   loginInstructor,
   getInstructorByEmail,
   getInstructorById,
-  deleteInstructor
+  deleteInstructor,
+  getClassroomsByInstructorId
 } = require("../db");
 const {requireAuthorization, requireAdmin,   requireAdminOrAuthorizedUser} = require('./utils/utils')
 const jwt = require("jsonwebtoken");
@@ -17,15 +18,13 @@ const ApiError = require('./error/ApiError')
 
 instructorsRouter.use((req, res, next) => {
   console.log("A request has been made to /instructors");
-  console.log('req.user:', req.instructor)
+  console.log('req.instructor:', req.instructor)
   next();
 });
 
 instructorsRouter.get("/", requireAdmin, async (req, res) => {
   try {
-    console.log('GET /instructors')
     const instructors = await getAllInstructors();
-    console.log('Instructors:', instructors)
     res.send({ success: true, instructors });
     return;
   } catch (error) {
@@ -33,11 +32,29 @@ instructorsRouter.get("/", requireAdmin, async (req, res) => {
   }
 });
 
+
+
+instructorsRouter.get('/me', async (req, res, next) => {
+  try {
+    console.log('/me route')
+    // const instructor = await getInstructorById({id: req.instructor.id});
+    const instructor = await getClassroomsByInstructorId({instructorId: req.instructor.id})
+    if (instructor){
+      res.send({
+        success: true,
+        instructor
+      })
+    }
+  } catch (error) {
+    throw error
+  }
+})
+
 instructorsRouter.get("/:instructorId", requireAdmin, async (req, res, next) => {
   const { instructorId } = req.params;
 
   try{
-    
+    console.log('/:instructorId')
     const instructor = await getInstructorById({id: instructorId})
     if (instructor){
       res.send({
@@ -49,6 +66,37 @@ instructorsRouter.get("/:instructorId", requireAdmin, async (req, res, next) => 
     throw error
   }
 })
+
+instructorsRouter.get('/:instructorId/classrooms', requireAdmin, async (req, res, next) => {
+  try {
+    console.log('/instructors/:instructorId/classrooms')
+    // const instructor = await getInstructorById({id: req.instructor.id});
+    const instructor = await getClassroomsByInstructorId({instructorId: req.instructor.id})
+    if (instructor){
+      res.send({
+        success: true,
+        instructor
+      })
+    }
+  } catch (error) {
+    throw error
+  }
+})
+
+// studentsRouter.get('/:instructorId',  async(req, res, next) => {
+//   try{
+
+//       //Only person who should be able to access this route is the
+//       //instructor in question or the admin
+//       const { instructorId } = req.params
+//       const students = await getStudentsByInstructor({id:instructorId})
+//   res.send({success: true, students})
+//   } catch (error){
+//       console.log(error)
+//       next({message: 'error'})
+//   }
+// })
+
 
 instructorsRouter.delete("/:instructorId", requireAdminOrAuthorizedUser, async (req, res, next) => {
   const { instructorId } = req.params;
@@ -77,10 +125,6 @@ instructorsRouter.post("/register", async (req, res, next) => {
       next(ApiError.badRequest("A user by that username already exists"))
       return;
     } 
-    // else if (_email){
-    //   next(ApiError.badRequest("A user has already used that email to sign up"))
-    //   return;
-    // } 
     else {
       const newUser = await createInstructor({
         name,

@@ -20,6 +20,7 @@ async function createInstructor({ name, username, password, isAdmin = false, ema
       `,
       [name, username, hashedPassword, isAdmin, hashedEmail, isActive]
     );
+    console.log('create user DB function:', user)
     return user;
   } catch (error) {
     throw error;

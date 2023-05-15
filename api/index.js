@@ -53,5 +53,7 @@ const instructorsRouter = require("./instructors");
 router.use("/instructors", instructorsRouter);
 const studentsRouter = require("./students");
 router.use("/students", studentsRouter);
+const classroomsRouter = require("./classrooms");
+router.use("/classrooms", classroomsRouter);
 
 module.exports = router;

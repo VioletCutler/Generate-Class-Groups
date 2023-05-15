@@ -18,16 +18,6 @@ studentsRouter.get('/', requireAdmin, async(req, res) => {
     }
 })
 
-studentsRouter.get('/:instructorId',  async(req, res, next) => {
-    try{
-        const { instructorId } = req.params
-        const students = await getStudentsByInstructor({id:instructorId})
-    res.send({success: true, students})
-    } catch (error){
-        console.log(error)
-        next({message: 'error'})
-    }
-})
 
 studentsRouter.patch('/:studentId', requireAuthorization, async(req, res, next) => {
     try{
