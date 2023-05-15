@@ -369,6 +369,11 @@ async function testCase2() {
       name: "Johnny's Classroom",
       inSession: false,
     });
+    const johnnysDuplicateClassroom = await createNewClassroom({
+      name: "Johnny's Classroom",
+      inSession: false,
+    });
+    console.log('Johnny\'s duplicate classroom:',johnnysDuplicateClassroom)
 
     //Assign Johnny to the new classroom
     const johnnysClassroomAssigment = await addInstructorToClass({

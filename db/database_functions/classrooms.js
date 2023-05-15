@@ -274,6 +274,7 @@ async function updateClassroom(id, fields = {}) {
         `,
       Object.values(fields)
     );
+    console.log('updated classroom :', classroom)
 
     return classroom;
   } catch (error) {

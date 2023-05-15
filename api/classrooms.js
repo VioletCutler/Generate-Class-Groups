@@ -6,7 +6,8 @@ const {
 const {
     createNewClassroom,
     addInstructorToClass,
-    getClassroomByName
+    getClassroomByName,
+    updateClassroom
 } = require('../db')
 const ApiError = require('./error/ApiError')
 
@@ -40,6 +41,37 @@ classroomsRouter.post('/', requireAuthorization, async (req, res, next) => {
         }
     } catch (error) {
         throw error
+    }
+})
+
+classroomsRouter.patch('/:classroomId', requireAuthorization, async (req, res, next) => {
+    try {
+        const { classroomId } = req.params;
+
+        //add logic to make sure that the person making the request is either an admin or is an instructor associated with this classroom
+
+        const {name, inSession} = req.body
+        const fieldsObject = {}
+        if (name){
+            const _classroom = await getClassroomByName({classroomName:name})
+            if (_classroom){
+                next(ApiError.badRequest('A classroom by that name already exists'));
+                return;
+            } else {
+                fieldsObject.name = name;
+            }
+        }
+        if (inSession){
+            fieldsObject.inSession = inSession;
+        }
+
+        const updatedClassroom = await updateClassroom(classroomId, fieldsObject)
+        res.send({
+            success:true,
+            updateClassroom
+        })
+    } catch (error) {
+        throw error;
     }
 })
 
