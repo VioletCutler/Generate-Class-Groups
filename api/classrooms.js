@@ -1,13 +1,15 @@
 const Express = require("express");
 const classroomsRouter = Express.Router();
-const { requireAuthorization } = require("./utils/utils");
+const { requireAuthorization, requireAdmin } = require("./utils/utils");
 const {
   createNewClassroom,
   addInstructorToClass,
   getClassroomByName,
   updateClassroom,
   getClassroomById,
-  deleteClassroom
+  deleteClassroom,
+  getAllClassrooms,
+  getClassroomsByInstructorId,
 } = require("../db");
 const ApiError = require("./error/ApiError");
 
@@ -16,6 +18,43 @@ classroomsRouter.use((req, res, next) => {
   next();
 });
 
+//GET all classrooms
+classroomsRouter.get("/", requireAdmin, async (req, res, next) => {
+  try {
+    const _classrooms = await getAllClassrooms();
+
+    const classrooms = await Promise.all(
+      _classrooms.map((classroom) => getClassroomById({ id: classroom.id }))
+    );
+
+    res.send({
+      success: true,
+      classrooms,
+    });
+  } catch (e) {
+    next(ApiError.internal("Something went wrong."));
+  }
+});
+
+//GET classrooms by id
+classroomsRouter.get(
+  "/:classroomId",
+  requireAuthorization,
+  async (req, res, next) => {
+    try {
+      const { classroomId } = req.params;
+
+      const classroom = await getClassroomByInstructorId({
+        id: req.instructor.id,
+      });
+      res.send({ success: true, classroom });
+    } catch (e) {
+      next(ApiError.internal("Something went wrong."));
+    }
+  }
+);
+
+//POST classroom
 classroomsRouter.post("/", requireAuthorization, async (req, res, next) => {
   const { classroomName, inSession } = await req.body;
   /*
@@ -99,27 +138,38 @@ classroomsRouter.patch(
   }
 );
 
-classroomsRouter.delete('/:classroomId', requireAuthorization, async (req, res, next) => {
+//DELETE classroom
+classroomsRouter.delete(
+  "/:classroomId",
+  requireAuthorization,
+  async (req, res, next) => {
     try {
-        const { classroomId } = req.params;
+      const { classroomId } = req.params;
 
-        const { instructors } = await getClassroomById({id: classroomId});
-        const correctInstructor = instructors.filter((instructor)=> instructor.id == req.instructor.id)
-        if (!correctInstructor.length){
-            next(ApiError.unauthorizedRequest("You are not authorized to make this request."))
-        }
-        const deletedClassroom = await deleteClassroom({id: classroomId});
-        if (deletedClassroom){
-            res.send({
-                success: true,
-                deletedClassroom
-            })
-        } else {
-            next(ApiError.internal("Something went wrong."))
-        }
+      const { instructors } = await getClassroomById({ id: classroomId });
+      const correctInstructor = instructors.filter(
+        (instructor) => instructor.id == req.instructor.id
+      );
+      if (!correctInstructor.length) {
+        next(
+          ApiError.unauthorizedRequest(
+            "You are not authorized to make this request."
+          )
+        );
+      }
+      const deletedClassroom = await deleteClassroom({ id: classroomId });
+      if (deletedClassroom) {
+        res.send({
+          success: true,
+          deletedClassroom,
+        });
+      } else {
+        next(ApiError.internal("Something went wrong."));
+      }
     } catch (error) {
-        throw error
+      throw error;
     }
-})
+  }
+);
 
 module.exports = classroomsRouter;
