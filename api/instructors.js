@@ -55,6 +55,7 @@ instructorsRouter.get("/:instructorId", requireAdmin, async (req, res, next) => 
 
   try{
     console.log('/:instructorId')
+    
     const instructor = await getInstructorById({id: instructorId})
     if (instructor){
       res.send({

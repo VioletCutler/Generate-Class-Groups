@@ -7,7 +7,10 @@ const {
     createNewClassroom,
     addInstructorToClass,
     getClassroomByName,
-    updateClassroom
+    updateClassroom,
+    enrollStudent,
+    createStudent,
+    getClassroomById
 } = require('../db')
 const ApiError = require('./error/ApiError')
 
@@ -38,6 +41,36 @@ classroomsRouter.post('/', requireAuthorization, async (req, res, next) => {
         
             console.log('classrooms router POST /')
             res.send({success: true})
+        }
+    } catch (error) {
+        throw error
+    }
+})
+
+classroomsRouter.post('/:classroomId', requireAuthorization, async (req, res, next) => {
+    try {
+        const { classroomId } = req.params;
+        const { studentsToEnroll } = req.body;
+
+        const classroom = await getClassroomById({id: classroomId})
+
+        if (classroom.classroomInfo === undefined){
+            next(ApiError.badRequest('This classroom does not exist'));
+            return;
+        }
+
+        const newlyCreatedStudents = await Promise.all(studentsToEnroll.map((student) => createStudent({name: student})));
+
+        const enrolledStudents = await Promise.all(newlyCreatedStudents.map((student) => enrollStudent({studentId: student.id, classroomId: classroomId})));
+
+        if (enrolledStudents.length){
+            res.send({
+                success:true,
+                enrolledStudents
+            });
+        } else {
+            next(ApiError.internal());
+            return;
         }
     } catch (error) {
         throw error
