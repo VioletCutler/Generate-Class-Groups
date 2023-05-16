@@ -40,25 +40,34 @@ classroomsRouter.post('/', requireAuthorization, async (req, res, next) => {
             await addInstructorToClass({classroomId: newClassroom.id, instructorId: req.instructor.id})
         
             console.log('classrooms router POST /')
-            res.send({success: true})
+            res.send({success: true, classroom: newClassroom})
         }
     } catch (error) {
         throw error
     }
 })
 
-classroomsRouter.post('/:classroomId', requireAuthorization, async (req, res, next) => {
+classroomsRouter.post('/:classroomId/students', requireAuthorization, async (req, res, next) => {
     try {
         const { classroomId } = req.params;
         const { studentsToEnroll } = req.body;
 
+        //check that there is an existing classroom with this Id
         const classroom = await getClassroomById({id: classroomId})
 
+        //if no classroom exists, send error message
         if (classroom.classroomInfo === undefined){
             next(ApiError.badRequest('This classroom does not exist'));
             return;
         }
 
+        //check the list of instructors and confirm that the person making this request is indeed associated with this classroom
+        const correctInstructor = classroom.instructors.filter((instructor) => instructor.id == req.instructor.id)
+
+        if (!correctInstructor.length){
+            next(ApiError.unauthorizedRequest('Wrong classroom'))
+            return;
+        }
         const newlyCreatedStudents = await Promise.all(studentsToEnroll.map((student) => createStudent({name: student})));
 
         const enrolledStudents = await Promise.all(newlyCreatedStudents.map((student) => enrollStudent({studentId: student.id, classroomId: classroomId})));
@@ -77,9 +86,29 @@ classroomsRouter.post('/:classroomId', requireAuthorization, async (req, res, ne
     }
 })
 
+classroomsRouter.delete('/:classroomId/students/:studentId', requireAuthorization, async (req, res, next) => {
+    try {
+        const { classroomId, studentId } = req.params;
+
+        const correctInstructor = classroom.instructors.filter((instructor) => instructor.id == req.instructor.id)
+
+        if (!correctInstructor.length){
+            next(ApiError.unauthorizedRequest('Wrong classroom'))
+            return;
+        }
+
+        const classroom = await getClassroomById({id: classroomId})
+
+    } catch (error) {
+        throw error
+    }
+})
+
 classroomsRouter.patch('/:classroomId', requireAuthorization, async (req, res, next) => {
     try {
         const { classroomId } = req.params;
+
+        
 
         //add logic to make sure that the person making the request is either an admin or is an instructor associated with this classroom
 

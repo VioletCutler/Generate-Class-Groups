@@ -167,7 +167,7 @@ async function getClassroomById({ id }) {
 
     const instructors = await client.query(
       `
-    SELECT instructors.name, instructors.username
+    SELECT instructors.name, instructors.username, instructors.id
     FROM "classrooms"
     JOIN "instructorsClasses" on "instructorsClasses"."classroomId" = classrooms.id
     JOIN "instructors" on "instructorsClasses"."instructorId" = instructors.id
