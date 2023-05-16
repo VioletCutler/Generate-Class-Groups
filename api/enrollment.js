@@ -9,6 +9,7 @@ enrollmentRouter.use((req, res, next) => {
   next();
 });
 
+//enroll student
 enrollmentRouter.post(
   "/:classroomId/students",
   requireAuthorization,
@@ -62,6 +63,7 @@ enrollmentRouter.post(
   }
 );
 
+//Unenroll student
 enrollmentRouter.delete(
   "/:classroomId/students/:studentId",
   requireAuthorization,
@@ -95,6 +97,7 @@ enrollmentRouter.delete(
   }
 );
 
+//Re-enroll student in new classroom
 enrollmentRouter.patch(
   "/:classroomId/students/:studentId",
   requireAuthorization,
