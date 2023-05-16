@@ -55,5 +55,7 @@ const studentsRouter = require("./students");
 router.use("/students", studentsRouter);
 const classroomsRouter = require("./classrooms");
 router.use("/classrooms", classroomsRouter);
+const enrollmentRouter = require("./enrollment");
+router.use("/enrollment", enrollmentRouter)
 
 module.exports = router;
