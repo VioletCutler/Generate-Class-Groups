@@ -26,6 +26,7 @@ instructorsRouter.use((req, res, next) => {
   next();
 });
 
+//GET all instructors
 instructorsRouter.get("/", requireAdmin, async (req, res) => {
   try {
     const instructors = await getAllInstructors();
@@ -36,6 +37,7 @@ instructorsRouter.get("/", requireAdmin, async (req, res) => {
   }
 });
 
+//GET logged in instructors info
 instructorsRouter.get("/me", async (req, res, next) => {
   try {
     console.log("/me route");
@@ -54,6 +56,7 @@ instructorsRouter.get("/me", async (req, res, next) => {
   }
 });
 
+//GET instructor by id
 instructorsRouter.get(
   "/:instructorId",
   requireAdmin,
@@ -76,12 +79,12 @@ instructorsRouter.get(
   }
 );
 
+//GET classrooms by instructorId
 instructorsRouter.get(
   "/:instructorId/classrooms",
   requireAdmin,
   async (req, res, next) => {
     try {
-      console.log("/instructors/:instructorId/classrooms");
       // const instructor = await getInstructorById({id: req.instructor.id});
       const instructor = await getClassroomsByInstructorId({
         instructorId: req.instructor.id,
@@ -112,6 +115,7 @@ instructorsRouter.get(
 //   }
 // })
 
+//DELETE instructor
 instructorsRouter.delete(
   "/:instructorId",
   requireAdminOrAuthorizedUser,
@@ -121,9 +125,9 @@ instructorsRouter.delete(
     if (req.instructor.isAdmin || req.instructor.id === instructorId) {
       const deletedUser = await deleteInstructor({ instructorId });
       if (deletedUser) {
-        res.send({ success: true, deletedUser });
+        res.send({ success: true, deletedUser, message: "User successfully deleted" });
       } else {
-        next(ApiError.internal("Something went wrong"));
+        next(ApiError.internal("Something went wrong."));
       }
     }
     return;
@@ -139,7 +143,7 @@ instructorsRouter.post("/register", async (req, res, next) => {
     //This function is currently broken because emails are enrypted
     // const _email = await getInstructorByEmail({email:email})
     if (_user) {
-      next(ApiError.badRequest("A user by that username already exists"));
+      next(ApiError.badRequest("A user by that username already exists."));
       return;
     } else {
       const newUser = await createInstructor({
@@ -160,7 +164,7 @@ instructorsRouter.post("/register", async (req, res, next) => {
       );
       res.send({
         success: true,
-        message: "Thank you for signing up",
+        message: "Thank you for signing up!",
         token,
       });
     }
@@ -174,7 +178,7 @@ instructorsRouter.post("/login", async (req, res, next) => {
     const { username, password } = req.body;
     const user = await loginInstructor({ username, password });
     if (!user) {
-      next(ApiError.badRequest("Username or password is incorrect"));
+      next(ApiError.badRequest("Username or password is incorrect."));
       return;
     } else {
       const token = jwt.sign(
@@ -185,6 +189,7 @@ instructorsRouter.post("/login", async (req, res, next) => {
         success: true,
         user,
         token,
+        message: "You have been logged in successfully."
       });
     }
   } catch (error) {

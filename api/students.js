@@ -9,7 +9,6 @@ const {
   enrollStudent,
   getClassroomById,
   deleteStudent,
-  getStudentsByInstructor,
 } = require("../db");
 const { requireAuthorization, requireAdmin } = require("./utils/utils.js");
 const ApiError = require("./error/ApiError");
@@ -23,15 +22,16 @@ studentsRouter.get("/", requireAdmin, async (req, res) => {
   try {
     const students = await getAllStudents();
     res.send({ success: true, students });
-  } catch (error) {
-    next({ message: "error" });
+  } catch (e) {
+    next(ApiError.internal("Something went wrong."));
   }
 });
 
 studentsRouter.post("/", requireAuthorization, async (req, res, next) => {
   const { student, classroomId } = req.body;
 
-  //confirm that a classrooms exists for student to be enrolled into
+  try {
+    //confirm that a classrooms exists for student to be enrolled into
   const classroom = await getClassroomById({ id: classroomId });
   if (classroom.classroomInfo === undefined) {
     next(
@@ -44,13 +44,17 @@ studentsRouter.post("/", requireAuthorization, async (req, res, next) => {
     const createdStudent = await createStudent({ name: student });
 
     //enroll new student in class
-    const enrolledStudent = await enrollStudent({
+    await enrollStudent({
       studentId: createdStudent.id,
       classroomId,
     });
 
     res.send({ success: true, student: createdStudent });
   }
+  } catch (e) {
+    next(ApiError.internal("There was an error creating this student."));
+  }
+  
 });
 
 studentsRouter.patch(
@@ -63,16 +67,21 @@ studentsRouter.patch(
 
       const studentToUpdate = await getStudentById({ id: studentId });
       if (!studentToUpdate) {
-        next(ApiError.badRequest("No student to update"));
+        next(ApiError.badRequest("No student to update."));
       }
 
       const updateObject = {};
       if (name) updateObject.name = name;
 
       const updatedStudent = await updateStudent(id, updateObject);
-      res.send({ success: true, updatedStudent });
-    } catch (error) {
-      next(ApiError.internal("There was an error updating this student"));
+      if (updatedStudent){
+        res.send({ success: true, updatedStudent, message: "Student successfully updated"});
+      } else {
+        next(ApiError.internal("There was an error updating this student."));
+    }
+
+    } catch (e) {
+      next(ApiError.internal("There was an error updating this student."));
     }
   }
 );
@@ -95,7 +104,7 @@ studentsRouter.delete(
       if (!correctStudent.length) {
         next(
           ApiError.unauthorizedRequest(
-            "you are not authorized to make this request"
+            "You are not authorized to make this request."
           )
         );
       }
@@ -107,11 +116,10 @@ studentsRouter.delete(
           deletedStudent,
         });
       } else {
-        ApiError.internal("something went wrong");
+        next(ApiError.internal("Something went wrong."));
       }
-    } catch (error) {
-      throw error;
-    }
+    } catch (e) {
+    next(ApiError.internal("There was an error deleting this student."));    }
   }
 );
 

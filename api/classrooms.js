@@ -6,6 +6,8 @@ const {
   addInstructorToClass,
   getClassroomByName,
   updateClassroom,
+  getClassroomById,
+  deleteClassroom
 } = require("../db");
 const ApiError = require("./error/ApiError");
 
@@ -26,7 +28,7 @@ classroomsRouter.post("/", requireAuthorization, async (req, res, next) => {
     const _classroom = await getClassroomByName({ classroomName });
 
     if (_classroom) {
-      next(ApiError.badRequest("A classroom by that name already exists"));
+      next(ApiError.badRequest("A classroom by that name already exists."));
     } else {
       //create new classroom
       const newClassroom = await createNewClassroom({
@@ -48,39 +50,76 @@ classroomsRouter.post("/", requireAuthorization, async (req, res, next) => {
   }
 });
 
+//PATCH classroom
 classroomsRouter.patch(
   "/:classroomId",
   requireAuthorization,
   async (req, res, next) => {
     try {
       const { classroomId } = req.params;
-
-      //add logic to make sure that the person making the request is either an admin or is an instructor associated with this classroom
-
       const { name, inSession } = req.body;
-      const fieldsObject = {};
-      if (name) {
-        const _classroom = await getClassroomByName({ classroomName: name });
-        if (_classroom) {
-          next(ApiError.badRequest("A classroom by that name already exists"));
-          return;
-        } else {
-          fieldsObject.name = name;
-        }
+
+      //confirm that classroom exists
+      const _classroom = await getClassroomByName({ classroomName: name });
+      if (_classroom) {
+        next(ApiError.badRequest("A classroom by that name already exists."));
+        return;
       }
+
+      //confirm that current user is correct instructor
+      const { instructors } = await getClassroomById({ id: classroomId });
+      const correctInstructor = instructors.filter(
+        (instructor) => instructor.id == req.instructor.id
+      );
+      if (!correctInstructor.length) {
+        next(
+          ApiError.unauthorizedRequest(
+            "You are not authorized to make this request."
+          )
+        );
+      }
+
+      //build fields object for updateClassroom function
+      const fieldsObject = {};
+      fieldsObject.name = name;
+
       if (inSession) {
         fieldsObject.inSession = inSession;
       }
 
+      //update classroom
       const updatedClassroom = await updateClassroom(classroomId, fieldsObject);
       res.send({
         success: true,
-        updateClassroom,
+        updatedClassroom,
       });
     } catch (error) {
       throw error;
     }
   }
 );
+
+classroomsRouter.delete('/:classroomId', requireAuthorization, async (req, res, next) => {
+    try {
+        const { classroomId } = req.params;
+
+        const { instructors } = await getClassroomById({id: classroomId});
+        const correctInstructor = instructors.filter((instructor)=> instructor.id == req.instructor.id)
+        if (!correctInstructor.length){
+            next(ApiError.unauthorizedRequest("You are not authorized to make this request."))
+        }
+        const deletedClassroom = await deleteClassroom({id: classroomId});
+        if (deletedClassroom){
+            res.send({
+                success: true,
+                deletedClassroom
+            })
+        } else {
+            next(ApiError.internal("Something went wrong."))
+        }
+    } catch (error) {
+        throw error
+    }
+})
 
 module.exports = classroomsRouter;
