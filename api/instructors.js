@@ -5,10 +5,11 @@ const {
   getInstructorByUsername,
   createInstructor,
   loginInstructor,
-  getInstructorByEmail,
   getInstructorById,
   deleteInstructor,
   getClassroomsByInstructorId,
+  getInstructorByEmail,
+  updateInstructor
 } = require("../db");
 const {
   requireAuthorization,
@@ -19,6 +20,8 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { JWT_SECRET, JWT_EXPIRES_IN } = process.env;
 const ApiError = require("./error/ApiError");
+const bcrypt = require('bcrypt');
+const SALT_COUNT = 10;
 
 instructorsRouter.use((req, res, next) => {
   console.log("A request has been made to /instructors");
@@ -137,20 +140,23 @@ instructorsRouter.delete(
 
 instructorsRouter.post("/register", async (req, res, next) => {
   try {
-    const { name, username, password, isAdmin, email } = req.body;
+    const { name, username, password, email } = req.body;
     const _user = await getInstructorByUsername({ username: username });
+    const _email = await getInstructorByEmail({email})
 
-    //This function is currently broken because emails are enrypted
-    // const _email = await getInstructorByEmail({email:email})
     if (_user) {
       next(ApiError.badRequest("A user by that username already exists."));
       return;
+    }  else if (_email){
+      next(
+        ApiError.badRequest("This email is already associated with an account")
+      )
     } else {
       const newUser = await createInstructor({
         name,
         username,
         password,
-        email,
+        email
       });
       const token = jwt.sign(
         {
@@ -196,5 +202,29 @@ instructorsRouter.post("/login", async (req, res, next) => {
     throw error;
   }
 });
+
+instructorsRouter.patch('/', requireAuthorization, async (req, res, next) => {
+  try {
+    const { name, username, password, email, isActive } = req.body;
+
+    const fieldsObject = {};
+    if (name) fieldsObject.name = name;
+    if (username) fieldsObject.username = username;
+    if (password) fieldsObject.password = await bcrypt.hash(password, SALT_COUNT)
+    if (email) fieldsObject.email = email;
+    if (isActive) fieldsObject.isActive = isActive;
+    const updatedInstructor = await updateInstructor(req.instructor.id, fieldsObject)
+    if (updatedInstructor){
+      res.send({success:true, updatedInstructor, message: "Account successfully updated."})
+    } else {
+      next(
+        ApiError.internal("Something went wrong.")
+      )
+    }
+
+  } catch (error) {
+    next(ApiError.internal("Something went wrong."))
+  }
+})
 
 module.exports = instructorsRouter;

@@ -27,18 +27,23 @@ studentsRouter.get("/", requireAdmin, async (req, res) => {
   }
 });
 
-studentsRouter.post("/", requireAuthorization, async (req, res, next) => {
+studentsRouter.post("/enrollment", requireAuthorization, async (req, res, next) => {
   const { student, classroomId } = req.body;
 
   try {
     //confirm that a classrooms exists for student to be enrolled into
   const classroom = await getClassroomById({ id: classroomId });
+  const correctInstructor = classroom.instructors.filter((instructor) => instructor.id == req.instructor.id)
   if (classroom.classroomInfo === undefined) {
     next(
       ApiError.badRequest(
-        "You must create a classroom before you can create a student."
+        "This classroom id does not match an existing classroom."
       )
     );
+  } else if (!correctInstructor.length) {
+    next(
+      ApiError.unauthorizedRequest("You can only enroll students in your classrooms")
+    )
   } else {
     //create new student
     const createdStudent = await createStudent({ name: student });
@@ -87,17 +92,19 @@ studentsRouter.patch(
 );
 
 studentsRouter.delete(
-  "/:studentId",
+  "/enrollment",
   requireAuthorization,
   async (req, res, next) => {
     try {
-      const { studentId } = req.params;
+      const { studentId } = req.body;
 
       //confirm that the student to delete is in fact this instructors student
       const usersStudents = await getStudentsByInstructor({
         id: req.instructor.id,
       });
-      const correctStudent = await usersStudents.filter(
+      console.log('Users Students:', usersStudents)
+      console.log(studentId)
+      const correctStudent = usersStudents.filter(
         (student) => student.id == studentId
       );
 

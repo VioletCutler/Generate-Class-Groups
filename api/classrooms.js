@@ -116,6 +116,7 @@ classroomsRouter.patch(
             "You are not authorized to make this request."
           )
         );
+        return;
       }
 
       //build fields object for updateClassroom function
