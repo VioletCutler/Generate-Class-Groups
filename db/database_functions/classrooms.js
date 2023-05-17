@@ -211,6 +211,8 @@ async function getClassroomById({ id }) {
       students: students.rows,
     };
 
+    console.log('Classroom:',classRoom)
+
     return classRoom;
   } catch (error) {
     throw error;

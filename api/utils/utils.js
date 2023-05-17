@@ -13,7 +13,6 @@ function requireAuthorization(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
-  console.log("Require Admin Middleware :");
   if (!req.instructor.isAdmin) {
     next(
       ApiError.unauthorizedRequest(

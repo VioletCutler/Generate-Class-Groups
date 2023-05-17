@@ -44,8 +44,8 @@ classroomsRouter.get(
     try {
       const { classroomId } = req.params;
 
-      const classroom = await getClassroomByInstructorId({
-        id: req.instructor.id,
+      const classroom = await getClassroomById({
+        id: classroomId
       });
       res.send({ success: true, classroom });
     } catch (e) {
@@ -151,12 +151,13 @@ classroomsRouter.delete(
       const correctInstructor = instructors.filter(
         (instructor) => instructor.id == req.instructor.id
       );
-      if (correctInstructor.length || req.instructor.isAdmin) {
+      if (!correctInstructor.length && !req.instructor.isAdmin) {
         next(
           ApiError.unauthorizedRequest(
             "You are not authorized to make this request."
           )
         );
+        return;
       }
       const deletedClassroom = await deleteClassroom({ id: classroomId });
       if (deletedClassroom) {
