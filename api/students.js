@@ -74,11 +74,11 @@ studentsRouter.patch(
       if (!studentToUpdate) {
         next(ApiError.badRequest("No student to update."));
       }
-
+      console.log('Student To Update:', studentToUpdate)
       const updateObject = {};
       if (name) updateObject.name = name;
-
-      const updatedStudent = await updateStudent(id, updateObject);
+      console.log('Update Object', updateObject)
+      const updatedStudent = await updateStudent(studentId, updateObject);
       if (updatedStudent){
         res.send({ success: true, updatedStudent, message: "Student successfully updated"});
       } else {

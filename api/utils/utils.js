@@ -1,7 +1,6 @@
 const ApiError = require("../error/ApiError");
 
 function requireAuthorization(req, res, next) {
-  console.log("Require Authorization Middleware :");
   if (!req.instructor) {
     next(
       ApiError.unauthorizedRequest(

@@ -23,6 +23,35 @@ async function createNewClassroom({ name, inSession = true }) {
 
 async function deleteClassroom({ id }) {
   try {
+    //Grab students associated with this classroom
+    const {
+      rows
+    } = await client.query(`
+      SELECT students.*
+      FROM students
+      JOIN "classEnrollment" ON "studentId" = students.id
+      WHERE "classroomId" = $1;
+    `, [id])
+
+    //Unenroll and then delete the students
+    await Promise.all(rows.map((student) => unenrollStudent({studentId: student.id})))
+
+    await Promise.all(rows.map( async (student) => 
+      await client.query(`
+        DELETE FROM students
+        WHERE id=$1
+        RETURNING *;
+      `, [student.id])
+    ))
+
+    // Delete Instructor Assignments
+    await client.query(`
+      DELETE
+      FROM "instructorsClasses"
+      WHERE "classroomId" = $1;
+    `, [id])
+
+    // Delete Classroom
     const {
       rows: [classroom],
     } = await client.query(

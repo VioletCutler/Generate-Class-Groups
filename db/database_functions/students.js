@@ -27,7 +27,6 @@ async function updateStudent(id, fields = {}) {
   if (setString.length === 0) {
     return;
   }
-
   try {
     if (setString.length > 0) {
       const {

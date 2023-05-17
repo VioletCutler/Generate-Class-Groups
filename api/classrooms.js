@@ -151,7 +151,7 @@ classroomsRouter.delete(
       const correctInstructor = instructors.filter(
         (instructor) => instructor.id == req.instructor.id
       );
-      if (!correctInstructor.length) {
+      if (correctInstructor.length || req.instructor.isAdmin) {
         next(
           ApiError.unauthorizedRequest(
             "You are not authorized to make this request."

@@ -121,18 +121,17 @@ instructorsRouter.get(
 //DELETE instructor
 instructorsRouter.delete(
   "/:instructorId",
-  requireAdminOrAuthorizedUser,
+  requireAuthorization,
   async (req, res, next) => {
     const { instructorId } = req.params;
 
-    if (req.instructor.isAdmin || req.instructor.id === instructorId) {
       const deletedUser = await deleteInstructor({ instructorId });
       if (deletedUser) {
         res.send({ success: true, deletedUser, message: "User successfully deleted" });
       } else {
         next(ApiError.internal("Something went wrong."));
       }
-    }
+    
     return;
     // I need to check to see if the user is either the same user or is an admin before deleting
   }
