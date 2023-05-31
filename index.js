@@ -5,9 +5,13 @@ const app = Express();
 const PORT = 1337
 const apiErrorHandler = require('./api/error/api-error-handler')
 const ApiError = require('./api/error/ApiError')
+const cors = require('cors')
+
+app.use(cors())
 
 app.use(morgan('dev'))
 app.use(Express.json())
+
 
 app.use((req, res, next)=>{
     console.log('<___ Body Logger Start ___>')

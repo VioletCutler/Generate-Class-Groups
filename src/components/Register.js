@@ -1,11 +1,15 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { registerUser } from '../api';
 
 
 
 const Register = ({setRegistered}) => {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
+    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('')
 
     const navigate = useNavigate()
     function handleSubmit(e){
@@ -13,16 +17,31 @@ const Register = ({setRegistered}) => {
         navigate('/')
     }
 
+    function handleSubmit(e){
+      e.preventDefault()
+      console.log('Submit')
+      registerUser({name, username, email, password})
+    }
+
     console.log('username :', username)
     console.log('password :', password)
+    console.log('name :', name)
+    console.log('email :', email)
+
   return (
     <div>
       <h2>Register</h2>
       <form onSubmit={handleSubmit} id='register-form'>
+        <label htmlFor="register-name-input">Name</label>
+        <input type="text" id="register-name-input" onChange={(e)=> setName((e.target.value))}></input>
         <label htmlFor="register-username-input">Username</label>
         <input id="register-username-input" type="text" onChange={(e) => {setUsername(e.target.value)}} minLength='3' required></input>
+        <label htmlFor="register-email-input">Email</label>
+        <input id="register-email-input" type="text" onChange={(e)=>setEmail(e.target.value)}></input>
         <label htmlFor="register-password-input">Password</label>
         <input id="register-password-input" type="password" onChange={(e) => {setPassword(e.target.value)}} minLength='8' maxLength='16' required></input>
+        <label htmlFor="register-confirm-password-input">ConfirmPassword</label>
+        <input id="register-confirm-password-input" type="password" onChange={(e) => {setConfirmPassword(e.target.value)}} minLength='8' maxLength='16' required></input>
         <input type='submit'  ></input>
         <p>password must be 8-16 characters long</p>
       </form>
