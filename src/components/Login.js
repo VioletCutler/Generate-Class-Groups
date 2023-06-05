@@ -15,7 +15,6 @@ const Login = ({ setRegistered, setLoggedIn }) => {
       if (data.success) {
         localStorage.setItem("token", data.token);
         setLoggedIn(true);
-        navigate('/home')
       } else {
         console.log(data.message);
       }

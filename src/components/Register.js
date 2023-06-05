@@ -18,7 +18,6 @@ const Register = ({ setRegistered, setLoggedIn }) => {
     if (data.success){
       localStorage.setItem('token', token);
       setLoggedIn(true);
-      navigate('/home');
     }
     } catch (error) {
       console.log(error)
