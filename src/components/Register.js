@@ -4,7 +4,7 @@ import { registerUser } from '../api';
 
 
 
-const Register = ({setRegistered}) => {
+const Register = ({setRegistered, setLoggedIn}) => {
     const [name, setName] = useState('');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('')
