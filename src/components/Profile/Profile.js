@@ -7,9 +7,7 @@ const Profile = ({ loggedIn, setLoggedIn }) => {
         <div>
           <h2>Profile</h2>
           <div id="profile-navigation">
-            <p>User Info</p>
-            <p>Classrooms & Students</p>
-            <p>Generate Groups</p>
+  
           </div>
         </div>
       ) : (

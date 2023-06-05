@@ -53,3 +53,22 @@ export async function loginUser({username, password}){
     console.log(error)
   }
 }
+
+export async function createClassroom({classroomName, inSession}){
+  try {
+    const response = await fetch('http://localhost:1337/api/classrooms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: json.stringify({
+        classroomName,
+        inSession
+      })
+    })
+    const data = response.json()
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}

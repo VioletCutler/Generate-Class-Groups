@@ -14,7 +14,10 @@ const Nav = ({loggedIn, setLoggedIn}) => {
             {
                 loggedIn ? 
                     <div>
-                        <Link to="/home">Home</Link>
+                        <Link to="/">Home</Link>
+                        <Link to='/userinfo'>User Info</Link>
+            <Link to='/classrooms'>Classrooms & Students</Link>
+            <Link to='/creategroups'>Generate Groups</Link>
                         <button onClick={() => handleLogout()}>Log Out</button> 
                     </div>
                 : null
