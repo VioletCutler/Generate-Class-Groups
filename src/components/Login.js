@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom';
+import { loginUser } from '../api';
 
 const Login = ({setRegistered}) => {
     const [username, setUsername] = useState('')
@@ -7,13 +8,18 @@ const Login = ({setRegistered}) => {
 
     const navigate = useNavigate()
 
-    function handleSubmit(e){
-        e.preventDefault()
-        navigate('/')
+   async function handleSubmit(e){
+    try {
+      e.preventDefault();
+      const data = await loginUser({username, password});
+      if (data.success){
+        localStorage.setItem('token', data.token)
+      }
+    } catch (error) {
+      console.log(error)
     }
+  }
 
-    console.log('username :', username)
-    console.log('password :', password)
   return (
     <div>
       <h2>Login</h2>
