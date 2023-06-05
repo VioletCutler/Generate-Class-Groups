@@ -104,20 +104,6 @@ instructorsRouter.get(
   }
 );
 
-// studentsRouter.get('/:instructorId',  async(req, res, next) => {
-//   try{
-
-//       //Only person who should be able to access this route is the
-//       //instructor in question or the admin
-//       const { instructorId } = req.params
-//       const students = await getStudentsByInstructor({id:instructorId})
-//   res.send({success: true, students})
-//   } catch (error){
-//       console.log(error)
-//       next({message: 'error'})
-//   }
-// })
-
 //DELETE instructor
 instructorsRouter.delete(
   "/:instructorId",
@@ -150,6 +136,8 @@ instructorsRouter.post("/register", async (req, res, next) => {
       next(
         ApiError.badRequest("This email is already associated with an account")
       )
+    } else if (password.length < 8){
+      ApiError.badRequest('Password is too short')
     } else {
       const newUser = await createInstructor({
         name,

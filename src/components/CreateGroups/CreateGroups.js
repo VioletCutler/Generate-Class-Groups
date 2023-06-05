@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
-import { studentList, absentStudentList } from "../dummyData/dummyData.js"
+import { studentList, absentStudentList } from "../../dummyData/dummyData.js"
 
-const Homepage = () => {
+const CreateGroups = () => {
     const [classList, setClassList] = useState(studentList)
     const [absentStudents, setAbsentStudents] = useState(absentStudentList)
 
@@ -43,4 +43,4 @@ const Homepage = () => {
     )
 }
 
-export default Homepage
+export default CreateGroups
