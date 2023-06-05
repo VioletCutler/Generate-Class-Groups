@@ -1,5 +1,5 @@
 import { useState } from "react"
-import {Login, Register, Profile} from './'
+import {Login, Register, Profile} from '..'
 
 const Account = ({loggedIn, setLoggedIn}) => {
     const [registered, setRegistered] = useState(false)

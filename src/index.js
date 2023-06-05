@@ -1,10 +1,22 @@
 import { createRoot } from "react-dom/client";
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Nav, CreateGroups, Account, Profile } from "./components/index";
+import {
+  Nav,
+  CreateGroups,
+  Account,
+  Profile,
+  UserInfo,
+} from "./components/index";
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      setLoggedIn(true);
+    }
+  }, []);
 
   return (
     <Router>
@@ -13,19 +25,31 @@ const App = () => {
         <Nav loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
         <main>
           <Routes>
-            {!loggedIn ?   <Route
-              path="/"
-              element={<Account setLoggedIn={setLoggedIn} />}
-            /> : <>
-            <Route path="/" element={<Profile loggedIn={loggedIn} setLoggedIn={setLoggedIn} />} />
-            <Route
-              path="/creategroups"
-              element={
-                <CreateGroups loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
-              }
-            />
-            </>}
-            
+            {!loggedIn ? (
+              <>
+              <Route path="/" element={<Account setLoggedIn={setLoggedIn} />} />
+              <Route path="*" element={<p>This page does not exist or you are not logged in</p>} /></>
+            ) : (
+              <>
+                <Route
+                  path="/"
+                  element={
+                    <Profile loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+                  }
+                />
+                <Route
+                  path="/creategroups"
+                  element={
+                    <CreateGroups
+                      loggedIn={loggedIn}
+                      setLoggedIn={setLoggedIn}
+                    />
+                  }
+                />
+                <Route path="/userinfo" element={<UserInfo />} />
+                <Route path="*" element={<p>Path not resolved</p>} />
+              </>
+            )}
           </Routes>
         </main>
       </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { studentList, absentStudentList } from "../dummyData/dummyData.js"
+import { studentList, absentStudentList } from "../../dummyData/dummyData.js"
 
 const CreateGroups = () => {
     const [classList, setClassList] = useState(studentList)
