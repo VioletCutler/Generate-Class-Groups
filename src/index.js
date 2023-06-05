@@ -17,8 +17,9 @@ const App = () => {
         <Nav loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>
         <main>
             <Routes>
-                <Route path="/makegroups" element={<Homepage loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
-                <Route path='/' element={<Account/>}/>
+              
+                <Route path="/home" element={<Homepage loggedIn={loggedIn} setLoggedIn={setLoggedIn}/>}/>
+                <Route path='/' element={<Account setLoggedIn={setLoggedIn}/>}/>
             </Routes>
         </main>
       </div>
