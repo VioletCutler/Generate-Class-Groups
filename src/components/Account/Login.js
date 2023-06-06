@@ -5,6 +5,7 @@ import { loginUser } from "../../api";
 const Login = ({ setRegistered, setLoggedIn }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("")
 
   const navigate = useNavigate();
 
@@ -13,10 +14,12 @@ const Login = ({ setRegistered, setLoggedIn }) => {
       e.preventDefault();
       const data = await loginUser({ username, password });
       if (data.success) {
+        localStorage.removeItem('token')
+        console.log('data.token', data.token)
         localStorage.setItem("token", data.token);
         setLoggedIn(true);
       } else {
-        console.log(data.message);
+        setErrorMessage(data.message)
       }
     } catch (error) {
       console.log(error);
@@ -26,6 +29,8 @@ const Login = ({ setRegistered, setLoggedIn }) => {
   return (
     <div>
       <h2>Login</h2>
+      {errorMessage ? <p className="api-error-message">{errorMessage}</p> : null}
+  
       <form onSubmit={handleSubmit} id="login-form">
         <label htmlFor="login-username-input">Username</label>
         <input

@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import {
   Nav,
   CreateGroups,
@@ -11,13 +11,25 @@ import {
 import { getMe } from './api/index'
 
 const App = () => {
+  const navigate = useNavigate()
   const [loggedIn, setLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState({})
+  const [tokenErrorMessage, setTokenErrorMessage] = useState('')
 
   async function fetchMe(){
     try {
-      const {instructor} = await getMe();
-      setUserInfo(instructor)
+      const response = await getMe();
+      console.log('response:', response)
+      if (response.success){
+        setTokenErrorMessage('')
+        setUserInfo(response.instructor)
+      } else if (response.message = 'jwt expired') {
+        setTokenErrorMessage('Your session has expired. You must log back in.')
+        localStorage.removeItem('token');
+        setLoggedIn(false)
+        navigate('/')
+      }
+
     } catch (error) {
       console.log(error)
     }
@@ -35,14 +47,12 @@ const App = () => {
     }
   }, [loggedIn])
 
-  console.log('User Info:', userInfo)
-
   return (
-    <Router>
       <div>
         <h1>Generate Student Groups</h1>
         <Nav loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
         <main>
+          {tokenErrorMessage ? <p>{tokenErrorMessage}</p> : null}
           <Routes>
             {!loggedIn ? (
               <>
@@ -65,17 +75,17 @@ const App = () => {
                     />
                   }
                 />
-                <Route path="/userinfo" element={<UserInfo userInfo={userInfo}/>} />
+                <Route path="/userinfo" element={<UserInfo userInfo={userInfo} setUserInfo={setUserInfo}/>} />
                 <Route path="*" element={<p>Path not resolved</p>} />
               </>
             )}
           </Routes>
         </main>
       </div>
-    </Router>
+
   );
 };
 
 const appElement = document.getElementById("app");
 const root = createRoot(appElement);
-root.render(<App />);
+root.render(<Router><App /></Router>);
