@@ -25,7 +25,6 @@ const SALT_COUNT = 10;
 
 instructorsRouter.use((req, res, next) => {
   console.log("A request has been made to /instructors");
-  console.log("req.instructor:", req.instructor);
   next();
 });
 
@@ -43,12 +42,12 @@ instructorsRouter.get("/", requireAdmin, async (req, res) => {
 //GET logged in instructors info
 instructorsRouter.get("/me", async (req, res, next) => {
   try {
-    console.log("/me route");
-    // const instructor = await getInstructorById({id: req.instructor.id});
-    const instructor = await getClassroomsByInstructorId({
+    const instructor = {}
+    instructor.userInfo = await getInstructorById({id: req.instructor.id});
+    instructor.classrooms = await getClassroomsByInstructorId({
       instructorId: req.instructor.id,
     });
-    if (instructor) {
+    if (instructor.userInfo) {
       res.send({
         success: true,
         instructor,
@@ -67,8 +66,6 @@ instructorsRouter.get(
     const { instructorId } = req.params;
 
     try {
-      console.log("/:instructorId");
-
       const instructor = await getInstructorById({ id: instructorId });
       if (instructor) {
         res.send({

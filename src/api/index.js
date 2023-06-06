@@ -72,3 +72,20 @@ export async function createClassroom({classroomName, inSession}){
     console.log(error)
   }
 }
+
+export async function getMe(){
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:1337/api/instructors/me',
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    }
+    )
+  } catch (error) {
+    
+  }
+}

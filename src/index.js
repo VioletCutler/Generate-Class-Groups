@@ -8,14 +8,19 @@ import {
   Profile,
   UserInfo,
 } from "./components/index";
+import { getMe } from './api/index'
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState({})
 
   useEffect(() => {
     if (localStorage.getItem("token")) {
       setLoggedIn(true);
+      const userInfo = getMe()
     }
+
+
   }, []);
 
   return (
