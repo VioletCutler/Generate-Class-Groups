@@ -26,10 +26,8 @@ export async function registerUser({ name, username, email, password }) {
       }
     );
     const data = await response.json();
-    console.log(data)
-    if (data.success){
-        localStorage.setItem('token', data.token)
-    }
+    console.log('Data from register:', data)
+    return data
   } catch (error) {
     console.log(error);
   }
@@ -75,6 +73,7 @@ export async function createClassroom({classroomName, inSession}){
 
 export async function getMe(){
   try {
+    console.log('getMe function call')
     const token = localStorage.getItem('token');
     const response = await fetch('http://localhost:1337/api/instructors/me',
     {
@@ -84,7 +83,9 @@ export async function getMe(){
         'Authorization': `Bearer ${token}`
       }
     }
-    )
+    );
+    const data = await response.json();
+    return data
   } catch (error) {
     
   }

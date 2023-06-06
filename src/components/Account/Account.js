@@ -1,13 +1,13 @@
 import { useState } from "react"
 import {Login, Register, Profile} from '..'
 
-const Account = ({loggedIn, setLoggedIn}) => {
+const Account = ({setLoggedIn}) => {
     const [registered, setRegistered] = useState(false)
 
     return (
         <div>
         {
-            registered ? <Login setRegistered={setRegistered} setLoggedIn={setLoggedIn} /> : <Register setRegistered={setRegistered} setLoggedIn={setLoggedIn}/>
+            registered ? <Login setRegistered={setRegistered} setLoggedIn={setLoggedIn}/> : <Register setRegistered={setRegistered} setLoggedIn={setLoggedIn} />
         }</div>
     )
 }

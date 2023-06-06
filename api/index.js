@@ -33,11 +33,14 @@ router.use(async (req, res, next) => {
     const prefix = "Bearer ";
     if (auth) {
       const token = auth.slice(prefix.length);
+      console.log('token:', token)
       const { id } = jwt.verify(token, JWT_SECRET);
+      console.log('jwt verify', id)
       if (!id) {
         next();
       } else {
-        const instructor = await getInstructorById({id: id});
+        const instructor = await getInstructorById({id});
+        console.log('instructor:', instructor)
         req.instructor = instructor;
         next();
       }
@@ -48,6 +51,11 @@ router.use(async (req, res, next) => {
     throw error;
   }
 });
+
+router.use((req, res, next) => {
+  console.log('req.instructor:', req.instructor)
+  next()
+})
 
 const instructorsRouter = require("./instructors");
 router.use("/instructors", instructorsRouter);

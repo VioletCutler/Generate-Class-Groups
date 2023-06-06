@@ -43,15 +43,17 @@ instructorsRouter.get("/", requireAdmin, async (req, res) => {
 instructorsRouter.get("/me", async (req, res, next) => {
   try {
     const instructor = {}
-    instructor.userInfo = await getInstructorById({id: req.instructor.id});
+    instructor.details = await getInstructorById({id: req.instructor.id});
     instructor.classrooms = await getClassroomsByInstructorId({
       instructorId: req.instructor.id,
     });
-    if (instructor.userInfo) {
+    if (instructor.details) {
       res.send({
         success: true,
         instructor,
       });
+    } else {
+      ApiError.badRequest('Something went wrong')
     }
   } catch (error) {
     throw error;

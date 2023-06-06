@@ -14,14 +14,28 @@ const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState({})
 
+  async function fetchMe(){
+    try {
+      const {instructor} = await getMe();
+      setUserInfo(instructor)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     if (localStorage.getItem("token")) {
       setLoggedIn(true);
-      const userInfo = getMe()
     }
-
-
   }, []);
+
+  useEffect(() => {
+    if (localStorage.getItem('token')){
+      fetchMe();
+    }
+  }, [loggedIn])
+
+  console.log('User Info:', userInfo)
 
   return (
     <Router>
@@ -32,7 +46,7 @@ const App = () => {
           <Routes>
             {!loggedIn ? (
               <>
-              <Route path="/" element={<Account setLoggedIn={setLoggedIn} />} />
+              <Route path="/" element={<Account setLoggedIn={setLoggedIn}  />} />
               <Route path="*" element={<p>This page does not exist or you are not logged in</p>} /></>
             ) : (
               <>
@@ -51,7 +65,7 @@ const App = () => {
                     />
                   }
                 />
-                <Route path="/userinfo" element={<UserInfo />} />
+                <Route path="/userinfo" element={<UserInfo userInfo={userInfo}/>} />
                 <Route path="*" element={<p>Path not resolved</p>} />
               </>
             )}

@@ -1,15 +1,12 @@
 import { useState } from 'react'
 
-const UserInfo = () => {
-    const [name, setName] = useState('useState test name value')
-    const [username, setUsername] = useState('useState test username value')
-    const [email, setEmail] = useState('useState test email value')
-    const [updateUserInfo, setUpdateUserInfo] = useState(false)
+const UserInfo = ({userInfo}) => {
+  const {details} = userInfo;
 
-console.log('__User Info__')
-console.log('Name:', name);
-console.log('Username :', username);
-console.log('Email :', email)
+    const [name, setName] = useState(details.name)
+    const [username, setUsername] = useState(details.username)
+    const [email, setEmail] = useState(details.email)
+    const [updateUserInfo, setUpdateUserInfo] = useState(false)
 
 function handleSubmit(e){
     e.preventDefault();
