@@ -90,3 +90,23 @@ export async function getMe(){
     
   }
 }
+
+export async function updateUserInfo({name, username, email, isActive=true}){
+  try {
+    const response = await fetch('http://localhost:1337/api/instructors', 
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({
+        name, username, email, isActive
+      })
+    })
+    const data = response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}

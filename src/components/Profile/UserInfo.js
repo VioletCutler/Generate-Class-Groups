@@ -1,22 +1,34 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { getMe, updateUserInfo } from '../../api'
 
 const UserInfo = ({userInfo}) => {
   const {details} = userInfo;
 
-    const [name, setName] = useState(details.name)
-    const [username, setUsername] = useState(details.username)
-    const [email, setEmail] = useState(details.email)
-    const [updateUserInfo, setUpdateUserInfo] = useState(false)
+  const [updateForm, setupdateForm] = useState(false)
+    const [name, setName] = useState('')
+    const [username, setUsername] = useState('')
+    const [email, setEmail] = useState('')
+    const [isActive, setIsActive] = useState(true)
 
-function handleSubmit(e){
+    useEffect(() => {
+      if (updateForm){
+        setName(details.name);
+        setUsername(details.username);
+        setEmail(details.email);
+      }
+    }, [updateForm])
+
+async function handleSubmit(e){
     e.preventDefault();
+    const updatedUser = await updateUserInfo({name, username, email, isActive});
+    console.log('Updated User:', updatedUser)
     //send PATCH fetch request
 }
 
   return (
     <div>
       <h2>User Info</h2>
-      {updateUserInfo ? 
+      {updateForm ? 
       <form onSubmit={handleSubmit}>
       <label htmlFor="name" >Name</label>
       <input id="name" value={name} onChange={(e)=>setName(e.target.value)}/>
@@ -25,10 +37,11 @@ function handleSubmit(e){
       <label htmlFor="email" >Email</label>
       <input id="email" value={email} onChange={(e)=>setEmail(e.target.value)}/>
       <button type="submit">Submit</button>
-      <button type="button" onClick={()=> setUpdateUserInfo(false)}>Cancel</button>
+      <button type="button" onClick={()=> setupdateForm(false)}>Cancel</button>
     </form> :
-    <button onClick={() => setUpdateUserInfo(true)}>Click to Update User Info</button>
+    <button onClick={() => setupdateForm(true)}>Click to Update User Info</button>
     }
+        <button>Delete Account</button>
       
     </div>
   );
