@@ -1,59 +1,99 @@
 import { useState, useEffect } from "react";
-import { getMe, updateUserInfo } from "../../api";
+import { getMe, updateUserInfo, deleteAccount } from "../../api";
+import { useNavigate } from 'react-router-dom'
 
-const UserInfo = ({ userInfo, setUserInfo }) => {
-  const { details } = userInfo;
+const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
+  const navigate = useNavigate()
 
   const [updateForm, setupdateForm] = useState(false);
+  const [userInfo, setUserInfo] = useState({});
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [isActive, setIsActive] = useState(true);
+  const [deleteButton, setDeleteButton] = useState(false);
+
+  async function fetchMe() {
+    try {
+      const response = await getMe();
+      if (response.success) {
+        setTokenErrorMessage("");
+        const user = response.instructor.details;
+        setUserInfo(user);
+        setName(user.name);
+        setUsername(user.username);
+        setEmail(user.email);
+      } else if ((response.message = "jwt expired")) {
+        setTokenErrorMessage("Your session has expired. You must log back in.");
+        localStorage.removeItem("token");
+        setLoggedIn(false);
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    fetchMe();
+  }, []);
 
   //This seems hacky but is my current idea for dealing with setting the state from fetched state above
-  useEffect(() => {
-    if (updateForm) {
-      setName(details.name);
-      setUsername(details.username);
-      setEmail(details.email);
-    }
-  }, [updateForm]);
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const updatedUser = await updateUserInfo({
+    const response = await updateUserInfo({
       name,
       username,
       email,
       isActive,
     });
-    console.log("Updated User:", updatedUser);
+    const user = response.updatedInstructor
+    setUserInfo(user);
+    console.log(user)
+    setName(user.name);
+    setUsername(user.username);
+    setEmail(user.email);
+    setupdateForm(false);
+  }
 
-    //send PATCH fetch request
+  async function handleDelete(){
+    try {
+      await deleteAccount(userInfo.id);
+      setLoggedIn(false);
+      navigate('/')
+    } catch (error) {
+      console.log(error)
+    }
+
   }
 
   return (
     <div>
       <h2>User Info</h2>
-      {updateForm ? (
+
+      {!userInfo.name ? null : updateForm ? (
         <form onSubmit={handleSubmit}>
           <label htmlFor="name">Name</label>
           <input
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            autoComplete="off"
           />
           <label htmlFor="username">Username</label>
           <input
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            autoComplete="off"
           />
           <label htmlFor="email">Email</label>
           <input
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            autoComplete="off"
           />
           <button type="submit">Submit</button>
           <button type="button" onClick={() => setupdateForm(false)}>
@@ -61,11 +101,31 @@ const UserInfo = ({ userInfo, setUserInfo }) => {
           </button>
         </form>
       ) : (
-        <button onClick={() => setupdateForm(true)}>
-          Click to Update User Info
-        </button>
+        <div>
+          <button onClick={() => setupdateForm(true)}>
+            Click to Update User Info
+          </button>
+          <div>
+            <p>Name: {name}</p>
+            <p>Username: {username}</p>
+            <p>Email: {email}</p>
+          </div>
+        </div>
       )}
-      <button>Delete Account</button>
+      <div id="user-info-display"></div>
+
+      <h3>Danger zone</h3>
+      <p>Deleting your account cannot be undone.</p>
+      {deleteButton ? (
+        <div>
+        <button onClick={() => handleDelete()}>Are you sure? This cannot be undone.</button>
+        <button onClick={() => setDeleteButton(false)}>Cancel</button>
+        </div>
+      ) : (
+        <div>
+ 
+        <button onClick={() => setDeleteButton(true)}>Click to Delete Account</button></div>
+      )}
     </div>
   );
 };
