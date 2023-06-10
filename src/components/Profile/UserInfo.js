@@ -67,9 +67,13 @@ const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
     }
   }
 
+
+
   return (
     <div>
       <h2>User Info</h2>
+
+      {/* {userInfo && userInfo.details ? <p>Welcome {userInfo.name}</p> : null} */}
 
       {!userInfo.name ? null : updateForm ? (
         <form onSubmit={handleSubmit}>
