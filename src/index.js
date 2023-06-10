@@ -7,6 +7,7 @@ import {
   Account,
   Profile,
   UserInfo,
+  Classrooms
 } from "./components/index";
 import { getMe } from './api/index'
 
@@ -76,6 +77,7 @@ const App = () => {
                   }
                 />
                 <Route path="/userinfo" element={<UserInfo userInfo={userInfo} setUserInfo={setUserInfo} setTokenErrorMessage={setTokenErrorMessage} setLoggedIn={setLoggedIn}/>} />
+                <Route path="/classrooms" element={<Classrooms userInfo={userInfo} setUserInfo={setUserInfo} setTokenErrorMessage={setTokenErrorMessage} setLoggedIn={setLoggedIn}/>} />
                 <Route path="*" element={<p>Path not resolved</p>} />
               </>
             )}

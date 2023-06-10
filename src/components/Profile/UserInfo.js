@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { getMe, updateUserInfo, deleteAccount } from "../../api";
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
 const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [updateForm, setupdateForm] = useState(false);
   const [userInfo, setUserInfo] = useState({});
@@ -48,24 +48,23 @@ const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
       email,
       isActive,
     });
-    const user = response.updatedInstructor
+    const user = response.updatedInstructor;
     setUserInfo(user);
-    console.log(user)
+    console.log(user);
     setName(user.name);
     setUsername(user.username);
     setEmail(user.email);
     setupdateForm(false);
   }
 
-  async function handleDelete(){
+  async function handleDelete() {
     try {
       await deleteAccount(userInfo.id);
       setLoggedIn(false);
-      navigate('/')
+      navigate("/");
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-
   }
 
   return (
@@ -112,20 +111,24 @@ const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
           </div>
         </div>
       )}
-      <div id="user-info-display"></div>
-
-      <h3>Danger zone</h3>
-      <p>Deleting your account cannot be undone.</p>
-      {deleteButton ? (
-        <div>
-        <button onClick={() => handleDelete()}>Are you sure? This cannot be undone.</button>
-        <button onClick={() => setDeleteButton(false)}>Cancel</button>
-        </div>
-      ) : (
-        <div>
- 
-        <button onClick={() => setDeleteButton(true)}>Click to Delete Account</button></div>
-      )}
+      <div id="danger-zone">
+        <h3>Danger zone</h3>
+        <p>Deleting your account cannot be undone.</p>
+        {deleteButton ? (
+          <div>
+            <button onClick={() => handleDelete()}>
+              Are you sure? This cannot be undone.
+            </button>
+            <button onClick={() => setDeleteButton(false)}>Cancel</button>
+          </div>
+        ) : (
+          <div>
+            <button onClick={() => setDeleteButton(true)}>
+              Click to Delete Account
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
