@@ -57,12 +57,14 @@ export async function loginUser({ username, password }) {
 
 export async function createClassroom({ classroomName, inSession }) {
   try {
+    console.log('classroomName:', classroomName)
     const response = await fetch("http://localhost:1337/api/classrooms", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem('token')}`
       },
-      body: json.stringify({
+      body: JSON.stringify({
         classroomName,
         inSession,
       }),
