@@ -7,3 +7,4 @@ export { default as Profile } from "./Profile/Profile";
 export { default as UserInfo } from "./Profile/UserInfo";
 export { default as Classrooms } from "./Classrooms/Classrooms";
 export { default as CreateClassroom } from "./Classrooms/CreateClassroom";
+export { default as SingleClassroom } from "./Classrooms/SingleClassroom";
