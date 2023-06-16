@@ -164,6 +164,8 @@ export async function updateClassroomInfo({id, name, inSession}){
         name, inSession
       })
     })
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.log(error)
   }

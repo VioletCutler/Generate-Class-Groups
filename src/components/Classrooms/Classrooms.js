@@ -1,19 +1,27 @@
 import { CreateClassroom, SingleClassroom } from "../index";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom"
-const Classrooms = ({
-  userInfo,
-  setUserInfo,
-  setLoggedIn,
-  setTokenErrorMessage,
-}) => {
-  const user = userInfo ? userInfo.details : null;
-  const classrooms = userInfo ? userInfo.classrooms : null;
+const Classrooms = (props) => {
+  // const user = userInfo ? userInfo.details : null;
+  // const classrooms = userInfo ? userInfo.classrooms : null;
+
+  // const userInfo = props.userInfo
+  // const setUserInfo = props.setUserInfo
 
   const [createClassroom, setCreateClassroom] = useState(false);
+  // const [classrooms, setClassrooms] = useState(props.classrooms && Object.keys(props.classrooms).length ? props.classrooms : [])
 
-  console.log("User:", user);
-  console.log("(11) Classrooms:", classrooms);
+  // function userInfoFunction(){
+  //   console.log('user info function', userInfo.classrooms)
+  //   const returnObj = [{classroomInfo: {
+  //     id:1, name: "test"}, instructors: [{
+  //       id: 2, name: "test name"
+  // }]}]
+  //   return userInfo.classrooms
+  // }
+  // console.log('userInfo Classrooms.js', userInfo.classroom)
+  console.log('props.classrooms:', props.classrooms)
+
 
   return (
     <div>
@@ -27,8 +35,8 @@ const Classrooms = ({
       ) : (
         <div>
           <h3>Current Classrooms</h3>
-          {classrooms ? (
-            classrooms.map((classroom) => {
+          {props.classrooms && props.classrooms.length ? (
+            props.classrooms.map((classroom) => {
               const { classroomInfo, instructors, students } = classroom;
 
               return (

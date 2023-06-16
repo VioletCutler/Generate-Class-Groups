@@ -2,8 +2,19 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getClassroomById, updateClassroomInfo } from "../../api";
 
-const SingleClassroom = ({ userInfo }) => {
+const SingleClassroom = ({userInfo}) => {
   const { id } = useParams();
+  console.log('user info:', userInfo)
+
+  let singleClassroom;
+  !userInfo === undefined ? singleClassroom = userInfo.classrooms.filter((classroom) => {
+    console.log('Classroom Filter:', classroom)
+    return classroom.classroom.id == id
+  })
+   : null
+
+  console.log('singleClassroom:', singleClassroom)
+
   const [classroomInfo, setClassroomInfo] = useState({});
   const [instructors, setInstructors] = useState([]);
   const [students, setStudents] = useState([]);
@@ -32,7 +43,12 @@ const SingleClassroom = ({ userInfo }) => {
   async function handleEditClassroom(e){
     e.preventDefault();
     console.log('Submit Edit Classroom')
-    const updatedClassroom = await updateClassroomInfo({id: classroomInfo.id, name, inSession})
+    const response = await updateClassroomInfo({id: classroomInfo.id, name, inSession})
+    // needs to be finished
+    if (response.success){
+      setClassroomInfo(response.updatedClassroom)
+      setEditClassroom(false)
+    }
   }
 
   return (
@@ -42,7 +58,7 @@ const SingleClassroom = ({ userInfo }) => {
         <div>
             <form onSubmit={handleEditClassroom}>
                 <label htmlFor="edit-classroom-name-input">Classroom Name</label>
-                <input id="edit-classroom-name-input" type="text" defaultValue={classroomInfo.name} onChange={() => setName(e.target.value)}></input> 
+                <input id="edit-classroom-name-input" type="text" defaultValue={classroomInfo.name} onChange={(e) => setName(e.target.value)}></input> 
                 <label htmlFor="edit-classroom-inSession-input">In Session?</label>
                 <input id="edit-classroom-is-active-input" type="checkbox" checked={inSession ? true : false} onChange={() => setInSession(!inSession)}></input>
                 <button type="submit">Update</button>
@@ -67,8 +83,7 @@ const SingleClassroom = ({ userInfo }) => {
 
       ) : (
         <div>
-          {console.log("Classroom.classinfo")}
-          <p>Something went wrong</p>
+          <p>Loading...</p>
         </div>
       )}
     </div>
