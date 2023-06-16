@@ -82,7 +82,7 @@ classroomsRouter.post("/", requireAuthorization, async (req, res, next) => {
       });
 
       console.log("classrooms router POST /");
-      res.send({ success: true, classroom: newClassroom });
+      res.send({ success: true, classroom: {classroomInfo: newClassroom, instructors: [req.instructor]}, students: [] });
     }
   } catch (error) {
     throw error;
@@ -100,8 +100,9 @@ classroomsRouter.patch(
 
       //confirm that classroom exists
       const _classroom = await getClassroomByName({ classroomName: name });
-      if (_classroom) {
-        next(ApiError.badRequest("A classroom by that name already exists."));
+      
+      if (_classroom.id != classroomId) {
+        next(ApiError.badRequest("A classroom by that name already exists. Try a different name."));
         return;
       }
 
@@ -120,12 +121,10 @@ classroomsRouter.patch(
       }
 
       //build fields object for updateClassroom function
-      const fieldsObject = {};
-      fieldsObject.name = name;
-
-      if (inSession) {
-        fieldsObject.inSession = inSession;
-      }
+      const fieldsObject = {
+        name,
+        inSession
+      };
 
       //update classroom
       const updatedClassroom = await updateClassroom(classroomId, fieldsObject);

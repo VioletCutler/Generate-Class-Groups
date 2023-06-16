@@ -176,7 +176,7 @@ async function getClassroomById({ id }) {
       rows: [classroom],
     } = await client.query(
       `
-      SELECT classrooms.name, classrooms.id
+      SELECT classrooms.name, classrooms.id, classrooms."inSession"
       FROM "classrooms"
       WHERE id=$1;
     `,

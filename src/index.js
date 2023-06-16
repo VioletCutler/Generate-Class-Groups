@@ -7,7 +7,8 @@ import {
   Account,
   Profile,
   UserInfo,
-  Classrooms
+  Classrooms,
+  SingleClassroom
 } from "./components/index";
 import { getMe } from './api/index'
 
@@ -20,7 +21,6 @@ const App = () => {
   async function fetchMe(){
     try {
       const response = await getMe();
-      console.log('response:', response)
       if (response.success){
         setTokenErrorMessage('')
         setUserInfo(response.instructor)
@@ -77,6 +77,7 @@ const App = () => {
                   }
                 />
                 <Route path="/userinfo" element={<UserInfo userInfo={userInfo} setUserInfo={setUserInfo} setTokenErrorMessage={setTokenErrorMessage} setLoggedIn={setLoggedIn}/>} />
+                <Route path="/classroom/:id" element={<SingleClassroom setUserInfo={setUserInfo} userInfo={userInfo} setTokenErrorMessage={setTokenErrorMessage} setLoggedIn={setLoggedIn}/>} />
                 <Route path="/classrooms" element={<Classrooms setUserInfo={setUserInfo} userInfo={userInfo} setTokenErrorMessage={setTokenErrorMessage} setLoggedIn={setLoggedIn}/>} />
                 <Route path="*" element={<p>Path not resolved</p>} />
               </>

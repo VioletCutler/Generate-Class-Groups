@@ -1,6 +1,6 @@
 import { CreateClassroom, SingleClassroom } from "../index";
 import { useState } from "react";
-
+import { Link } from "react-router-dom"
 const Classrooms = ({
   userInfo,
   setUserInfo,
@@ -32,12 +32,13 @@ const Classrooms = ({
               const { classroomInfo, instructors, students } = classroom;
 
               return (
-                <SingleClassroom
-                  key={classroomInfo.id}
-                  classroomInfo={classroomInfo}
-                  instructors={instructors}
-                  students={students}
-                />
+                <div className="profile-classroom-section" key={classroomInfo.id}>
+                  <Link to={`/classroom/${classroomInfo.id}`}>{classroomInfo.name}</Link>
+                  <h4>Instructors:</h4>
+                  {instructors.map((instructor) => {
+                    return <p key={instructor.id}>{instructor.name}</p>;
+                  })}
+                </div>
               );
             })
           ) : (

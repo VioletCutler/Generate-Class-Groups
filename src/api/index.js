@@ -136,3 +136,35 @@ export async function deleteAccount(instructorId){
     console.log(error)
   }
 }
+
+export async function getClassroomById(id) {
+  try {
+    const response = await fetch(`http://localhost:1337/api/classrooms/${id}`, {
+      headers : {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    const data = await response.json();
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function updateClassroomInfo({id, name, inSession}){
+  try {
+    const response = await fetch(`http://localhost:1337/api/classrooms/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({
+        name, inSession
+      })
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
