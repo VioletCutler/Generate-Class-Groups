@@ -1,27 +1,10 @@
 import { CreateClassroom, SingleClassroom } from "../index";
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"
-const Classrooms = (props) => {
-  // const user = userInfo ? userInfo.details : null;
-  // const classrooms = userInfo ? userInfo.classrooms : null;
-
-  // const userInfo = props.userInfo
-  // const setUserInfo = props.setUserInfo
-
+import { Link } from "react-router-dom";
+const Classrooms = ({userInfo, setUserInfo}) => {
   const [createClassroom, setCreateClassroom] = useState(false);
-  // const [classrooms, setClassrooms] = useState(props.classrooms && Object.keys(props.classrooms).length ? props.classrooms : [])
 
-  // function userInfoFunction(){
-  //   console.log('user info function', userInfo.classrooms)
-  //   const returnObj = [{classroomInfo: {
-  //     id:1, name: "test"}, instructors: [{
-  //       id: 2, name: "test name"
-  // }]}]
-  //   return userInfo.classrooms
-  // }
-  // console.log('userInfo Classrooms.js', userInfo.classroom)
-  console.log('props.classrooms:', props.classrooms)
-
+  console.log('Classrooms user info', userInfo)
 
   return (
     <div>
@@ -35,13 +18,18 @@ const Classrooms = (props) => {
       ) : (
         <div>
           <h3>Current Classrooms</h3>
-          {props.classrooms && props.classrooms.length ? (
-            props.classrooms.map((classroom) => {
+          {userInfo && userInfo.classrooms ? (
+            userInfo.classrooms.map((classroom) => {
               const { classroomInfo, instructors, students } = classroom;
 
               return (
-                <div className="profile-classroom-section" key={classroomInfo.id}>
-                  <Link to={`/classroom/${classroomInfo.id}`}>{classroomInfo.name}</Link>
+                <div
+                  className="profile-classroom-section"
+                  key={classroomInfo.id}
+                >
+                  <Link to={`/classroom/${classroomInfo.id}`}>
+                    {classroomInfo.name}
+                  </Link>
                   <h4>Instructors:</h4>
                   {instructors.map((instructor) => {
                     return <p key={instructor.id}>{instructor.name}</p>;

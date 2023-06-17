@@ -50,7 +50,6 @@ const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
     });
     const user = response.updatedInstructor;
     setUserInfo(user);
-    console.log(user);
     setName(user.name);
     setUsername(user.username);
     setEmail(user.email);

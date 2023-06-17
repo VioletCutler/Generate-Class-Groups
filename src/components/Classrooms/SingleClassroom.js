@@ -2,18 +2,14 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getClassroomById, updateClassroomInfo } from "../../api";
 
-const SingleClassroom = ({userInfo}) => {
+const SingleClassroom = ({userInfo, setUserInfo, count, setCount}) => {
   const { id } = useParams();
-  console.log('user info:', userInfo)
 
-  let singleClassroom;
-  !userInfo === undefined ? singleClassroom = userInfo.classrooms.filter((classroom) => {
-    console.log('Classroom Filter:', classroom)
-    return classroom.classroom.id == id
-  })
-   : null
-
-  console.log('singleClassroom:', singleClassroom)
+  // let singleClassroom;
+  // classrooms && classrooms.length ? singleClassroom = classrooms.filter((classroom) => {
+  //   return classroom.classroomInfo.id == id
+  // })
+  //  : console.log('filter not working')
 
   const [classroomInfo, setClassroomInfo] = useState({});
   const [instructors, setInstructors] = useState([]);
@@ -22,6 +18,7 @@ const SingleClassroom = ({userInfo}) => {
   //edit information
   const [name, setName] = useState("");
   const [inSession, setInSession] = useState(false);
+
 
   async function fetchClassroom() {
     try {
@@ -42,18 +39,36 @@ const SingleClassroom = ({userInfo}) => {
 
   async function handleEditClassroom(e){
     e.preventDefault();
-    console.log('Submit Edit Classroom')
     const response = await updateClassroomInfo({id: classroomInfo.id, name, inSession})
     // needs to be finished
     if (response.success){
+      //remove existing classroom information:
+      const untouchedClassrooms = userInfo.classrooms.filter((classroom) => classroom.classroomInfo.id != response.updatedClassroom.id)
+
+      //remove updated classroom from state
+      const updatedClassroom = userInfo.classrooms.filter((classroom) => classroom.classroomInfo.id == response.updatedClassroom.id)
+
+      //update that information to add back into state
+      const finalizedUpdatedClassroom = {...updatedClassroom[0], classroomInfo: response.updatedClassroom}      
+
+      //set state with updated classroom and pre-existing classrooms
+      setUserInfo({...userInfo, classrooms: [...untouchedClassrooms, finalizedUpdatedClassroom]})
       setClassroomInfo(response.updatedClassroom)
       setEditClassroom(false)
+      setCount(count + 1)
     }
   }
+  
 
   return (
     <div>
-      {classroomInfo ? 
+      {instructors.length ? 
+      (
+        <div>
+      <p>Instructors from Single Classroom: {instructors[0].name}</p>
+      </div>) : null   
+    }
+      {instructors.length ? 
       editClassroom ? (
         <div>
             <form onSubmit={handleEditClassroom}>
@@ -70,6 +85,7 @@ const SingleClassroom = ({userInfo}) => {
       (
         <div className="profile-classroom-section" key={classroomInfo.id}>
           <h4>{classroomInfo.name}</h4>
+          <p>Classroom is currently {classroomInfo.inSession ? null : "not"} in Session</p>
           <h5>Instructors:</h5>
           {instructors.map((instructor) => {
             return <p key={instructor.id}>{instructor.name}</p>;

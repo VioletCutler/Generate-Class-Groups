@@ -15,7 +15,6 @@ const Login = ({ setRegistered, setLoggedIn }) => {
       const data = await loginUser({ username, password });
       if (data.success) {
         localStorage.removeItem('token')
-        console.log('data.token', data.token)
         localStorage.setItem("token", data.token);
         setLoggedIn(true);
       } else {

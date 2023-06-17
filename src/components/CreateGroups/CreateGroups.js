@@ -7,8 +7,6 @@ const CreateGroups = () => {
 
 
     function handleAbsentStudentClick(e){
-        console.log(e.target.id)
-        console.log(classList[e.target.id])
         setAbsentStudents([...absentStudents, classList[e.target.id]])
         const updatedClassList = [];
         for (let i = 0; i < classList.length; i++){

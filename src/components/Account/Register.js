@@ -13,7 +13,6 @@ const Register = ({ setRegistered, setLoggedIn }) => {
     try {
       e.preventDefault();
     const data = await registerUser({ name, username, email, password });
-    console.log('register response:', data)
     if (data.success){
       localStorage.setItem('token', data.token);
       console.log('Token check', data.token === localStorage.getItem('token'))

@@ -11,7 +11,6 @@ const helperObj = {
       helperObj.currentRoom = helperObj.currentRoom - 1;
     }
     for (let i = 0; i < studentsArray.length; i++) {
-      console.log(helperObj.currentRoom)
       helperObj.finalGroups[`roomNumber${helperObj.currentRoom}`].push(
         studentsArray[i]
       );
@@ -26,7 +25,6 @@ const helperObj = {
   }
   
   function pickRandomStudent(listOfStudents, currentGroup) {
-      console.log(listOfStudents, currentGroup)
     let randomStudent =
       listOfStudents[Math.floor(Math.random() * listOfStudents.length)];
     while (currentGroup.includes(randomStudent)) {

@@ -6,13 +6,9 @@ const CreateClassroom = ({setCreateClassroom, userInfo, setUserInfo}) => {
     const [inSession, setInSession] = useState(false);
     const [errorMessage, setErrorMessage] = useState("")
 
-    console.log('inSession:', inSession)
-
     async function handleSubmit(e) {
         e.preventDefault()
-        console.log('Submit')
         const response = await createClassroom({classroomName, inSession});
-        console.log('new classroom', response)
         if (response.success){
             const updatedUserInfo = userInfo;
             updatedUserInfo.classrooms.push(response.classroom)

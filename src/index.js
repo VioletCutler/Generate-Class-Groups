@@ -15,14 +15,14 @@ import {
   Classrooms,
   SingleClassroom,
 } from "./components/index";
-import Test from './components/Classrooms/Test'
 import { getMe } from "./api/index";
 
 const App = () => {
   const navigate = useNavigate();
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState({});
   const [tokenErrorMessage, setTokenErrorMessage] = useState("");
+  const [count, setCount] = useState(0)
 
   async function fetchMe() {
     try {
@@ -43,13 +43,15 @@ const App = () => {
 
   useEffect(() => {
     if (localStorage.getItem("token")) {
-      // setLoggedIn(true);
-      fetchMe();
+      setLoggedIn(true);
     }
   }, []);
 
-  console.log("index.js User Info", userInfo);
-
+  useEffect(() => {
+    if (loggedIn){
+      fetchMe();
+    }
+  }, [loggedIn])
   return (
     <div>
       <h1>Generate Student Groups</h1>
@@ -89,6 +91,8 @@ const App = () => {
                     setUserInfo={setUserInfo}
                     setTokenErrorMessage={setTokenErrorMessage}
                     setLoggedIn={setLoggedIn}
+                    count={count}
+                    setCount={setCount}
                   />
                 }
               />
@@ -100,6 +104,9 @@ const App = () => {
                     userInfo={userInfo}
                     setTokenErrorMessage={setTokenErrorMessage}
                     setLoggedIn={setLoggedIn}
+                    classrooms={userInfo.classrooms}
+                    count={count}
+                    setCount={setCount}
                   />
                 }
               />
@@ -112,16 +119,11 @@ const App = () => {
                     setTokenErrorMessage={setTokenErrorMessage}
                     setLoggedIn={setLoggedIn}
                     classrooms={userInfo.classrooms}
+                    count={count}
+                    setCount={setCount}
                   />
                 }
               />
-              <Route
-                path="/test"
-                element={
-                  <Test
-                    userInfo={userInfo}
-                  />
-                } />
               <Route path="*" element={<p>Path not resolved</p>} />
             </>
           )}
