@@ -5,6 +5,7 @@ require("dotenv").config();
 const { JWT_SECRET } = process.env;
 const jwt = require("jsonwebtoken");
 const { getInstructorById } = require("../db");
+const ApiError = require('./error/ApiError')
 
 // router.use('*', (req, res, next)=> {
 //     console.log('a request is being made to the API router')
@@ -27,17 +28,34 @@ router.use("/health", async (req, res, next) => {
   }
 });
 
+
 router.use(async (req, res, next) => {
   const auth = req.header("Authorization");
   try {
     const prefix = "Bearer ";
     if (auth) {
       const token = auth.slice(prefix.length);
-      const { id } = jwt.verify(token, JWT_SECRET);
-      if (!id) {
+      console.log('token:', token)
+      const isValidToken = jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        console.log('__jwt verify__')
+        console.log('err:', err)
+        console.log('decoded:', decoded)
+        if (err) {
+          console.log('line 44')
+          return next(ApiError.badRequest(err.message));
+        } else {
+          return decoded.id
+        }
+      });
+
+      console.log('Is Valid Token:', isValidToken)
+      if (!isValidToken) {
+        console.log('line 52')
         next();
+        return;
       } else {
-        const instructor = await getInstructorById({id: id});
+        console.log('line 56')
+        const instructor = await getInstructorById({id: isValidToken});
         req.instructor = instructor;
         next();
       }
@@ -48,6 +66,11 @@ router.use(async (req, res, next) => {
     throw error;
   }
 });
+
+router.use((req, res, next) => {
+  console.log('req.instructor:', req.instructor)
+  next()
+})
 
 const instructorsRouter = require("./instructors");
 router.use("/instructors", instructorsRouter);

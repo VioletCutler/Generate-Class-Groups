@@ -25,7 +25,6 @@ const SALT_COUNT = 10;
 
 instructorsRouter.use((req, res, next) => {
   console.log("A request has been made to /instructors");
-  console.log("req.instructor:", req.instructor);
   next();
 });
 
@@ -41,18 +40,20 @@ instructorsRouter.get("/", requireAdmin, async (req, res) => {
 });
 
 //GET logged in instructors info
-instructorsRouter.get("/me", async (req, res, next) => {
+instructorsRouter.get("/me", requireAuthorization, async (req, res, next) => {
   try {
-    console.log("/me route");
-    // const instructor = await getInstructorById({id: req.instructor.id});
-    const instructor = await getClassroomsByInstructorId({
+    const instructor = {}
+    instructor.details = await getInstructorById({id: req.instructor.id});
+    instructor.classrooms = await getClassroomsByInstructorId({
       instructorId: req.instructor.id,
     });
-    if (instructor) {
+    if (instructor.details) {
       res.send({
         success: true,
         instructor,
       });
+    } else {
+      next(ApiError.badRequest('Something went wrong'))
     }
   } catch (error) {
     throw error;
@@ -67,8 +68,6 @@ instructorsRouter.get(
     const { instructorId } = req.params;
 
     try {
-      console.log("/:instructorId");
-
       const instructor = await getInstructorById({ id: instructorId });
       if (instructor) {
         res.send({
@@ -137,7 +136,7 @@ instructorsRouter.post("/register", async (req, res, next) => {
         ApiError.badRequest("This email is already associated with an account")
       )
     } else if (password.length < 8){
-      ApiError.badRequest('Password is too short')
+      next(ApiError.badRequest('Password is too short'))
     } else {
       const newUser = await createInstructor({
         name,
@@ -150,9 +149,8 @@ instructorsRouter.post("/register", async (req, res, next) => {
           id: newUser.id,
           username: newUser.name,
         },
-        JWT_SECRET,
-        {
-          expiresIn: JWT_EXPIRES_IN,
+        JWT_SECRET, {
+          expiresIn: JWT_EXPIRES_IN
         }
       );
       res.send({
@@ -176,8 +174,11 @@ instructorsRouter.post("/login", async (req, res, next) => {
     } else {
       const token = jwt.sign(
         { id: user.id, username: user.username },
-        JWT_SECRET
+        JWT_SECRET, {
+          expiresIn: JWT_EXPIRES_IN
+        }
       );
+      console.log('token', token)
       res.send({
         success: true,
         user,

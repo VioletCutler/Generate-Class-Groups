@@ -1,40 +1,139 @@
-import { useState } from 'react'
+import { useState, useEffect } from "react";
+import { getMe, updateUserInfo, deleteAccount } from "../../api";
+import { useNavigate } from "react-router-dom";
 
-const UserInfo = () => {
-    const [name, setName] = useState('useState test name value')
-    const [username, setUsername] = useState('useState test username value')
-    const [email, setEmail] = useState('useState test email value')
-    const [updateUserInfo, setUpdateUserInfo] = useState(false)
+const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
+  const navigate = useNavigate();
 
-console.log('__User Info__')
-console.log('Name:', name);
-console.log('Username :', username);
-console.log('Email :', email)
+  const [updateForm, setupdateForm] = useState(false);
+  const [userInfo, setUserInfo] = useState({});
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [isActive, setIsActive] = useState(true);
+  const [deleteButton, setDeleteButton] = useState(false);
 
-function handleSubmit(e){
+  async function fetchMe() {
+    try {
+      const response = await getMe();
+      if (response.success) {
+        setTokenErrorMessage("");
+        const user = response.instructor.details;
+        setUserInfo(user);
+        setName(user.name);
+        setUsername(user.username);
+        setEmail(user.email);
+      } else if ((response.message = "jwt expired")) {
+        setTokenErrorMessage("Your session has expired. You must log back in.");
+        localStorage.removeItem("token");
+        setLoggedIn(false);
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    fetchMe();
+  }, []);
+
+  //This seems hacky but is my current idea for dealing with setting the state from fetched state above
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    //send PATCH fetch request
-}
+    const response = await updateUserInfo({
+      name,
+      username,
+      email,
+      isActive,
+    });
+    const user = response.updatedInstructor;
+    setUserInfo(user);
+    setName(user.name);
+    setUsername(user.username);
+    setEmail(user.email);
+    setupdateForm(false);
+  }
+
+  async function handleDelete() {
+    try {
+      await deleteAccount(userInfo.id);
+      setLoggedIn(false);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
 
   return (
     <div>
       <h2>User Info</h2>
-      {updateUserInfo ? 
-      <form onSubmit={handleSubmit}>
-      <label htmlFor="name" >Name</label>
-      <input id="name" value={name} onChange={(e)=>setName(e.target.value)}/>
-      <label htmlFor="username" >Username</label>
-      <input id="username" value={username} onChange={(e)=>setUsername(e.target.value)}/>
-      <label htmlFor="email" >Email</label>
-      <input id="email" value={email} onChange={(e)=>setEmail(e.target.value)}/>
-      <button type="submit">Submit</button>
-      <button type="button" onClick={()=> setUpdateUserInfo(false)}>Cancel</button>
-    </form> :
-    <button onClick={() => setUpdateUserInfo(true)}>Click to Update User Info</button>
-    }
-      
+
+      {/* {userInfo && userInfo.details ? <p>Welcome {userInfo.name}</p> : null} */}
+
+      {!userInfo.name ? null : updateForm ? (
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="name">Name</label>
+          <input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoComplete="off"
+          />
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="off"
+          />
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="off"
+          />
+          <button type="submit">Submit</button>
+          <button type="button" onClick={() => setupdateForm(false)}>
+            Cancel
+          </button>
+        </form>
+      ) : (
+        <div>
+          <button onClick={() => setupdateForm(true)}>
+            Click to Update User Info
+          </button>
+          <div>
+            <p>Name: {name}</p>
+            <p>Username: {username}</p>
+            <p>Email: {email}</p>
+          </div>
+        </div>
+      )}
+      <div id="danger-zone">
+        <h3>Danger zone</h3>
+        <p>Deleting your account cannot be undone.</p>
+        {deleteButton ? (
+          <div>
+            <button onClick={() => handleDelete()}>
+              Are you sure? This cannot be undone.
+            </button>
+            <button onClick={() => setDeleteButton(false)}>Cancel</button>
+          </div>
+        ) : (
+          <div>
+            <button onClick={() => setDeleteButton(true)}>
+              Click to Delete Account
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default UserInfo
+export default UserInfo;

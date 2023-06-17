@@ -143,7 +143,7 @@ async function getInstructorById({ id }) {
       rows: [instructor],
     } = await client.query(
       `
-        SELECT id, username, "isAdmin"
+        SELECT id, username, "isAdmin", email, name
         FROM "instructors"
         WHERE id=$1
     `,

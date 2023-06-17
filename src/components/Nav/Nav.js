@@ -4,7 +4,7 @@ const Nav = ({loggedIn, setLoggedIn}) => {
     const navigate = useNavigate()
 
     function handleLogout(){
-        localStorage.setItem('token', null);
+        localStorage.removeItem('token');
         setLoggedIn(false);
         navigate('/')
     }

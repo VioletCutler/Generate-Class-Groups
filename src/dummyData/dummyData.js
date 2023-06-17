@@ -4,7 +4,7 @@ for (let i = 0; i < 50; i++) {
   studentList.push(`Student Number ${i}`);
 }
 
-console.log(studentList)
+// console.log(studentList)
 const absentStudentList = [];
 for (let i = 0; i < 3; i++){
   const absentStudentListIndex = Math.floor(Math.random() * studentList.length)

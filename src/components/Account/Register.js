@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { registerUser } from "../../api";
 
 const Register = ({ setRegistered, setLoggedIn }) => {
@@ -9,14 +9,13 @@ const Register = ({ setRegistered, setLoggedIn }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const navigate = useNavigate();
-
   async function handleSubmit(e) {
     try {
       e.preventDefault();
     const data = await registerUser({ name, username, email, password });
     if (data.success){
-      localStorage.setItem('token', token);
+      localStorage.setItem('token', data.token);
+      console.log('Token check', data.token === localStorage.getItem('token'))
       setLoggedIn(true);
     }
     } catch (error) {

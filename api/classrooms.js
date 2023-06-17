@@ -45,7 +45,7 @@ classroomsRouter.get(
       const { classroomId } = req.params;
 
       const classroom = await getClassroomById({
-        id: classroomId
+        id: classroomId,
       });
       res.send({ success: true, classroom });
     } catch (e) {
@@ -82,7 +82,14 @@ classroomsRouter.post("/", requireAuthorization, async (req, res, next) => {
       });
 
       console.log("classrooms router POST /");
-      res.send({ success: true, classroom: newClassroom });
+      res.send({
+        success: true,
+        classroom: {
+          classroomInfo: newClassroom,
+          instructors: [req.instructor],
+        },
+        students: [],
+      });
     }
   } catch (error) {
     throw error;
@@ -97,11 +104,16 @@ classroomsRouter.patch(
     try {
       const { classroomId } = req.params;
       const { name, inSession } = req.body;
-
+      console.log('PATCH /classrooms (name)', name)
       //confirm that classroom exists
       const _classroom = await getClassroomByName({ classroomName: name });
-      if (_classroom) {
-        next(ApiError.badRequest("A classroom by that name already exists."));
+
+      if (_classroom && _classroom.id != classroomId) {
+        next(
+          ApiError.badRequest(
+            "A classroom by that name already exists. Try a different name."
+          )
+        );
         return;
       }
 
@@ -119,16 +131,11 @@ classroomsRouter.patch(
         return;
       }
 
-      //build fields object for updateClassroom function
-      const fieldsObject = {};
-      fieldsObject.name = name;
-
-      if (inSession) {
-        fieldsObject.inSession = inSession;
-      }
-
       //update classroom
-      const updatedClassroom = await updateClassroom(classroomId, fieldsObject);
+      const updatedClassroom = await updateClassroom(classroomId, {
+        name,
+        inSession,
+      });
       res.send({
         success: true,
         updatedClassroom,
