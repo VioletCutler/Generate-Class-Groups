@@ -1,19 +1,45 @@
 import { useState, useEffect } from "react"
 import { studentList, absentStudentList } from "../../dummyData/dummyData.js"
+import { useParams } from 'react-router-dom'
+import { getClassroomById } from "../../api/index.js" 
 
 const CreateGroups = () => {
-    const [classList, setClassList] = useState(studentList)
-    const [absentStudents, setAbsentStudents] = useState(absentStudentList)
+    const { id } = useParams();
+
+    const [classList, setClassList] = useState([])
+    const [absentStudents, setAbsentStudents] = useState([])
+
+    async function fetchStudents(){
+        try {
+            const response = await getClassroomById(id);
+            console.log('Create Groups Fetch Classroom:', response);
+            if (response.success){
+                setClassList(response.classroom.students)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    // Fetch students for this classroom
+    useEffect(() => {
+        fetchStudents()
+    }, [])
 
 
     function handleAbsentStudentClick(e){
-        setAbsentStudents([...absentStudents, classList[e.target.id]])
-        const updatedClassList = [];
-        for (let i = 0; i < classList.length; i++){
-            if (i != e.target.id)updatedClassList.push(classList[i])
-        }
+        const [ absentStudent ] = classList.filter((student) => student.id == e.target.id)
+        console.log('absentStudent:', absentStudent);
+        setAbsentStudents([...absentStudents, absentStudent])
+        const updatedClassList = classList.filter((student) => student.id != e.target.id);
+        // for (let i = 0; i < classList.length; i++){
+        //     if (i != e.target.id)updatedClassList.push(classList[i])
+        // }
+        console.log('updatedClassList:', updatedClassList)
         setClassList(updatedClassList)
     }
+
+    console.log('Absent Student State:', absentStudents)
 
     return (
         <div>
@@ -21,9 +47,9 @@ const CreateGroups = () => {
         <div>      
              <h3>Absent Students</h3> 
             {absentStudents.length ? 
-     absentStudents.map((absentStudent, idx) => {
+     absentStudents.map((absentStudent) => {
                 return (
-                    <p key={idx}>{absentStudent}</p>
+                    <p key={absentStudent.id}>{absentStudent.name}</p>
                 )
             }) : null}
         </div>
@@ -31,11 +57,11 @@ const CreateGroups = () => {
             {classList.length ? classList.map((student, idx) => {
                 return(
                     <div className="current-class-list" key={idx}>
-                    <p>{student}</p>
-                    <button id={idx} onClick={handleAbsentStudentClick}>Absent</button>
+                    <p>{student.name}</p>
+                    <button id={student.id} onClick={handleAbsentStudentClick}>Absent</button>
                     </div>
                 )
-            }) : <p>No Students Yet</p>}
+            }) : null}
         </div>
         </div>
     )

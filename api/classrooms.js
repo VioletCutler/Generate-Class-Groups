@@ -47,6 +47,7 @@ classroomsRouter.get(
       const classroom = await getClassroomById({
         id: classroomId,
       });
+
       res.send({ success: true, classroom });
     } catch (e) {
       next(ApiError.internal("Something went wrong."));
@@ -104,7 +105,7 @@ classroomsRouter.patch(
     try {
       const { classroomId } = req.params;
       const { name, inSession } = req.body;
-      console.log('PATCH /classrooms (name)', name)
+      console.log("PATCH /classrooms (name)", name);
       //confirm that classroom exists
       const _classroom = await getClassroomByName({ classroomName: name });
 
