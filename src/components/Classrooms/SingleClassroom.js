@@ -1,24 +1,28 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { getClassroomById, updateClassroomInfo, deleteClassroom } from "../../api";
-import { useNavigate } from 'react-router-dom'
+import {
+  getClassroomById,
+  updateClassroomInfo,
+  deleteClassroom,
+  addStudentToClass
+} from "../../api";
+import { useNavigate } from "react-router-dom";
 
 const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
   const { id } = useParams();
-  const navigate = useNavigate()
-  // let singleClassroom;
-  // classrooms && classrooms.length ? singleClassroom = classrooms.filter((classroom) => {
-  //   return classroom.classroomInfo.id == id
-  // })
-  //  : console.log('filter not working')
+  const navigate = useNavigate();
 
   const [classroomInfo, setClassroomInfo] = useState({});
   const [instructors, setInstructors] = useState([]);
   const [students, setStudents] = useState([]);
   const [editClassroom, setEditClassroom] = useState(false);
-  //edit information
+
+  //Edit Classroom Information
   const [name, setName] = useState("");
   const [inSession, setInSession] = useState(false);
+
+  //Create New Students
+  const [newStudentName, setNewStudentName] = useState("");
 
   useEffect(() => {
     fetchClassroom();
@@ -75,29 +79,45 @@ const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
     }
   }
 
-  async function handleDeleteClassroom(e){
+  async function handleDeleteClassroom(e) {
     try {
       e.preventDefault();
       const response = await deleteClassroom(id);
 
-      const updatedClassroomList = userInfo.classrooms.filter(
-        (classroom) => {
-          console.log('classroom.classroomInfo.id', classroom.classroomInfo.id);
-          console.log('response.deletedClassroom.id', response.deletedClassroom.id);
-          return classroom.classroomInfo.id != response.deletedClassroom.id
-        }
-      );
+      const updatedClassroomList = userInfo.classrooms.filter((classroom) => {
+        console.log("classroom.classroomInfo.id", classroom.classroomInfo.id);
+        console.log(
+          "response.deletedClassroom.id",
+          response.deletedClassroom.id
+        );
+        return classroom.classroomInfo.id != response.deletedClassroom.id;
+      });
 
       setUserInfo({
         ...userInfo,
         classrooms: [...updatedClassroomList],
       });
 
-      console.log('updated classroom list', updatedClassroomList)
+      console.log("updated classroom list", updatedClassroomList);
 
-      navigate('/classrooms')
+      navigate("/classrooms");
     } catch (error) {
-      console.log(error)
+      console.log(error);
+    }
+  }
+
+  async function handleSubmitStudent(e) {
+    e.preventDefault();
+    try {
+      const response = await addStudentToClass({ student: newStudentName, classroomId: id });
+
+      if (response.success){
+        setStudents([...students, response.student])
+        setNewStudentName("")
+        document.getElementById("add-student").value = ""
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -144,6 +164,12 @@ const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
               return <p key={instructor.id}>{instructor.name}</p>;
             })}
             <h5>Students:</h5>
+            <form onSubmit={handleSubmitStudent}>
+              <p>Add Student to class</p>
+              <label htmlFor="add-student">Name</label>
+              <input id="add-student" type="text" onChange={(e) => setNewStudentName(e.target.value)}/>
+              <button type="submit">Add</button>
+            </form>
             {students.map((student) => {
               return <p key={student.id}>{student.name}</p>;
             })}
