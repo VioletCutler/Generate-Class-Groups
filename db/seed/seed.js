@@ -416,9 +416,9 @@ async function testCase2() {
     console.log("Johnny's Classrooms :", johnnysClassrooms);
 
     // Delete Johnny\'s Account
-    console.log("Deleting Johnny's Account...");
+    // console.log("Deleting Johnny's Account...");
     // const deletedJohnny = await deleteInstructor({ instructorId: johnny.id });
-    console.log("Deleted Johnny:", deletedJohnny);
+    // console.log("Deleted Johnny:", deletedJohnny);
 
     console.log("//=============== End Test Case 2 ====================//");
   } catch (error) {
