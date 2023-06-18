@@ -78,7 +78,7 @@ const App = () => {
                 }
               />
               <Route
-                path="/creategroups"
+                path="/generategroups/:id"
                 element={
                   <CreateGroups loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
                 }

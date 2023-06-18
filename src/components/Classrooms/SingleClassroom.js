@@ -164,6 +164,8 @@ const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
               return <p key={instructor.id}>{instructor.name}</p>;
             })}
             <h5>Students:</h5>
+            <button onClick={() => navigate(`/generategroups/${classroomInfo.id}`)}>Generate Groups
+              </button>
             <form onSubmit={handleSubmitStudent}>
               <p>Add Student to class</p>
               <label htmlFor="add-student">Name</label>
