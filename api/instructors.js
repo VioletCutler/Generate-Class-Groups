@@ -203,6 +203,8 @@ instructorsRouter.patch('/', requireAuthorization, async (req, res, next) => {
     if (isActive) fieldsObject.isActive = isActive;
     const updatedInstructor = await updateInstructor(req.instructor.id, fieldsObject)
     if (updatedInstructor){
+      delete updatedInstructor.password
+      delete updatedInstructor.isAdmin
       res.send({success:true, updatedInstructor, message: "Account successfully updated."})
     } else {
       next(

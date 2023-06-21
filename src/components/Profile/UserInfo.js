@@ -2,45 +2,43 @@ import { useState, useEffect } from "react";
 import { getMe, updateUserInfo, deleteAccount } from "../../api";
 import { useNavigate } from "react-router-dom";
 
-const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
+const UserInfo = ({ userInfo, setUserInfo, setTokenErrorMessage, setLoggedIn }) => {
   const navigate = useNavigate();
 
   const [updateForm, setupdateForm] = useState(false);
-  const [userInfo, setUserInfo] = useState({});
+  // const [userInfo, setUserInfo] = useState({});
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [deleteButton, setDeleteButton] = useState(false);
 
-  async function fetchMe() {
-    try {
-      const response = await getMe();
-      if (response.success) {
-        setTokenErrorMessage("");
-        const user = response.instructor.details;
-        setUserInfo(user);
-        setName(user.name);
-        setUsername(user.username);
-        setEmail(user.email);
-      } else if ((response.message = "jwt expired")) {
-        setTokenErrorMessage("Your session has expired. You must log back in.");
-        localStorage.removeItem("token");
-        setLoggedIn(false);
-        navigate("/");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  // async function fetchMe() {
+  //   try {
+  //     const response = await getMe();
+  //     if (response.success) {
+  //       setTokenErrorMessage("");
+  //       const user = response.instructor.details;
+  //       setUserInfo(user);
+  //       setName(user.name);
+  //       setUsername(user.username);
+  //       setEmail(user.email);
+  //     } else if ((response.message = "jwt expired")) {
+  //       setTokenErrorMessage("Your session has expired. You must log back in.");
+  //       localStorage.removeItem("token");
+  //       setLoggedIn(false);
+  //       navigate("/");
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
-  useEffect(() => {
-    fetchMe();
-  }, []);
+  // useEffect(() => {
+  //   fetchMe();
+  // }, []);
 
-  //This seems hacky but is my current idea for dealing with setting the state from fetched state above
-
-  async function handleSubmit(e) {
+  async function handleUpdate(e) {
     e.preventDefault();
     const response = await updateUserInfo({
       name,
@@ -48,12 +46,30 @@ const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
       email,
       isActive,
     });
+    console.log('Should be unchanged user info', userInfo)
+    const classrooms = userInfo.classrooms;
+    if (name != userInfo.details.name || username != userInfo.details.username){
+      function removeAndReplaceInstructor(classroom){
+        const [ instructorInfo ] = classroom.instructors.filter((instructor) => instructor.id == userInfo.details.id)
+        console.log('instructorInfo:', instructorInfo)
+        instructorInfo.name = response.updatedInstructor.name;
+        instructorInfo.username = response.updatedInstructor.username;
+        console.log('updatedInstructorInfo:', instructorInfo)
+        const updatedInstructorsList = classroom.instructors.filter((instructor) => instructor.id != userInfo.details.id)
+        updatedInstructorsList.push(instructorInfo)
+      }
+      classrooms.map(removeAndReplaceInstructor)
+    }
+    console.log('updatedClassrooms:', classrooms)
     const user = response.updatedInstructor;
-    setUserInfo(user);
-    setName(user.name);
-    setUsername(user.username);
-    setEmail(user.email);
+    setUserInfo({details:user, classrooms})
+
+    // setUserInfo(user);
+    // setName(user.name);
+    // setUsername(user.username);
+    // setEmail(user.email);
     setupdateForm(false);
+
   }
 
   async function handleDelete() {
@@ -66,6 +82,7 @@ const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
     }
   }
 
+  console.log('user info:', userInfo)
 
 
   return (
@@ -74,26 +91,26 @@ const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
 
       {/* {userInfo && userInfo.details ? <p>Welcome {userInfo.name}</p> : null} */}
 
-      {!userInfo.name ? null : updateForm ? (
-        <form onSubmit={handleSubmit}>
+      {!userInfo ? null : updateForm ? (
+        <form onSubmit={handleUpdate}>
           <label htmlFor="name">Name</label>
           <input
             id="name"
-            value={name}
+            defaultValue={userInfo.details.name}
             onChange={(e) => setName(e.target.value)}
             autoComplete="off"
           />
           <label htmlFor="username">Username</label>
           <input
             id="username"
-            value={username}
+            defaultValue={userInfo.details.username}
             onChange={(e) => setUsername(e.target.value)}
             autoComplete="off"
           />
           <label htmlFor="email">Email</label>
           <input
             id="email"
-            value={email}
+            defaultValue={userInfo.details.email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="off"
           />
@@ -107,11 +124,12 @@ const UserInfo = ({ setTokenErrorMessage, setLoggedIn }) => {
           <button onClick={() => setupdateForm(true)}>
             Click to Update User Info
           </button>
+          {userInfo.details ? 
           <div>
-            <p>Name: {name}</p>
-            <p>Username: {username}</p>
-            <p>Email: {email}</p>
-          </div>
+          <p>Name: {userInfo.details.name}</p>
+          <p>Username: {userInfo.details.username}</p>
+          <p>Email: {userInfo.details.email}</p>
+        </div> : null}
         </div>
       )}
       <div id="danger-zone">

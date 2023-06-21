@@ -44,6 +44,11 @@ const CreateGroups = () => {
     return (
         <div>
         <h2>Generate Groups Below</h2>
+        <form>
+            <label htmlFor="group-size-input"/>
+            <input id="group-size-input" type="number"/>
+            <button type="submit">Generate Groups</button>
+        </form>
         <div>      
              <h3>Absent Students</h3> 
             {absentStudents.length ? 
@@ -63,6 +68,7 @@ const CreateGroups = () => {
                 )
             }) : null}
         </div>
+
         </div>
     )
 }
