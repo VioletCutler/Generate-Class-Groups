@@ -7,6 +7,7 @@ import {
   addStudentToClass
 } from "../../api";
 import { useNavigate } from "react-router-dom";
+import { Student } from "../index";
 
 const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
   const { id } = useParams();
@@ -173,7 +174,7 @@ const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
               <button type="submit">Add</button>
             </form>
             {students.map((student) => {
-              return <p key={student.id}>{student.name}</p>;
+              return <Student key={student.id} student={student} students={students} setStudents={setStudents}/>;
             })}
             <button onClick={() => setEditClassroom(true)}>
               Edit Classroom Information

@@ -209,3 +209,21 @@ export async function addStudentToClass({student, classroomId}){
   }
 }
 
+export async function updateStudent({studentId, name}){
+  try {
+    const response = await fetch(`http://localhost:1337/api/students/${studentId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({
+        name
+      })
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error)
+  }
+}

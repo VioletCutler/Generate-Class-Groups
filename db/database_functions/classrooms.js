@@ -222,7 +222,6 @@ async function getClassroomById({ id }) {
 // Get instructors by classroom Id
 async function getInstructorsByClassroomId({ id }) {
   try {
-    console.log(id);
     const { rows } = await client.query(
       `
       SELECT instructors.*

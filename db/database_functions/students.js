@@ -29,18 +29,15 @@ async function updateStudent(id, fields = {}) {
   }
   try {
     if (setString.length > 0) {
-      const {
-        rows: [student],
-      } = await client.query(
+      await client.query(
         `
             UPDATE students
             SET ${setString}
             WHERE id=${id}
-            RETURNING *;
         `,
         Object.values(fields)
       );
-
+      const student = await getStudentById({id})
       return student;
     }
   } catch (error) {
@@ -61,18 +58,15 @@ async function getAllStudents() {
   }
 }
 
-// Get Student by Id
-async function getStudentById({ id }) {
+// Get student by Id
+async function getStudentById({ id }){
   try {
-    const {
-      rows: [student],
-    } = await client.query(
-      `
-    SELECT * FROM students
-    WHERE id=$1;
-  `,
-      [id]
-    );
+    const { rows: [ student ]} = await client.query(`
+      SELECT students.*, "classEnrollment".*
+      FROM students
+      JOIN "classEnrollment" ON students.id = "classEnrollment"."studentId"
+      WHERE students.id = $1
+    `, [id]);
     return student;
   } catch (error) {
     throw error;
@@ -123,4 +117,5 @@ module.exports = {
   getStudentById,
   deleteStudent,
   getStudentByName,
+  getStudentById
 };
