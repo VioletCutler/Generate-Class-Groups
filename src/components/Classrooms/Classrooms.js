@@ -27,13 +27,13 @@ const Classrooms = ({userInfo, setUserInfo}) => {
                   className="profile-classroom-section"
                   key={classroomInfo.id}
                 >
-                  <Link to={`/classroom/${classroomInfo.id}`}>
+                  <Link to={`/classrooms/${classroomInfo.id}`}>
                     {classroomInfo.name}
                   </Link>
-                  <h4>Instructors:</h4>
+                  {/* <h4>Instructors:</h4>
                   {instructors.map((instructor) => {
                     return <p key={instructor.id}>{instructor.name}</p>;
-                  })}
+                  })} */}
                 </div>
               );
             })

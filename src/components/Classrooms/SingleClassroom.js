@@ -6,7 +6,7 @@ import {
   deleteClassroom,
   addStudentToClass
 } from "../../api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Student } from "../index";
 
 const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
@@ -124,11 +124,13 @@ const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
 
   return (
     <div>
-      {instructors.length ? (
+
+      {/* Eventually add in ability for multiple instructors to run the same classroom */}
+      {/* {instructors.length ? (
         <div>
           <p>Instructors from Single Classroom: {instructors[0].name}</p>
         </div>
-      ) : null}
+      ) : null} */}
       {instructors.length ? (
         editClassroom ? (
           <div>
@@ -160,11 +162,11 @@ const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
               Classroom is currently {classroomInfo.inSession ? null : "not"} in
               Session
             </p>
-            <h5>Instructors:</h5>
+            {/* <h5>Instructors:</h5>
             {instructors.map((instructor) => {
               return <p key={instructor.id}>{instructor.name}</p>;
-            })}
-            <h5>Students:</h5>
+            })} */}
+            {/* <h5>Students:</h5> */}
             <button onClick={() => navigate(`/generategroups/${classroomInfo.id}`)}>Generate Groups
               </button>
             <form onSubmit={handleSubmitStudent}>
@@ -174,7 +176,8 @@ const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
               <button type="submit">Add</button>
             </form>
             {students.map((student) => {
-              return <Student key={student.id} student={student} students={students} setStudents={setStudents}/>;
+              return <Link key={student.id} to={`/studentinfo/${student.studentId}`}>{student.name}</Link>
+              // return <Student key={student.id} student={student} students={students} setStudents={setStudents}/>;
             })}
             <button onClick={() => setEditClassroom(true)}>
               Edit Classroom Information

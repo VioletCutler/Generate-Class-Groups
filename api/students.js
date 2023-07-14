@@ -9,6 +9,7 @@ const {
   enrollStudent,
   getClassroomById,
   deleteStudent,
+  getInstructorsByClassroomId
 } = require("../db");
 const { requireAuthorization, requireAdmin } = require("./utils/utils.js");
 const ApiError = require("./error/ApiError");
@@ -26,6 +27,31 @@ studentsRouter.get("/", requireAdmin, async (req, res) => {
     next(ApiError.internal("Something went wrong."));
   }
 });
+
+studentsRouter.get('/:studentId', requireAuthorization, async (req, res, next) => {
+  try {
+    const { studentId } = req.params;
+    const student = await getStudentById({id: studentId})
+    console.log('student:', student)
+    if (student){
+      const instructors = await getInstructorsByClassroomId({id: student.classroomId})
+      const correctInstructor = instructors.filter((instructor) => instructor.id == req.instructor.id)
+      if (correctInstructor.length){
+        res.send({success: true, student})
+      } else {
+        next(ApiError.unauthorizedRequest('Unauthorized user.'))
+        return
+      }
+    } else {
+      next(ApiError.badRequest('No student found.'))
+      return
+    }
+   
+ 
+  } catch (error) {
+    throw error
+  }
+})
 
 studentsRouter.post(
   "/enrollment",
@@ -113,11 +139,11 @@ studentsRouter.patch(
 );
 
 studentsRouter.delete(
-  "/enrollment",
+  "/:studentId",
   requireAuthorization,
   async (req, res, next) => {
     try {
-      const { studentId } = req.body;
+      const { studentId } = req.params;
 
       //confirm that the student to delete is in fact this instructors student
       const usersStudents = await getStudentsByInstructor({
