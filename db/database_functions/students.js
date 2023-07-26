@@ -92,16 +92,15 @@ async function getStudentByName({ name }) {
 
 async function getInstructorIdByStudentId({ id }){
   try {
-    console.log('ID in getInstructorByStudentId', id)
+
     const { rows: [ student ] } = await client.query(`
-    SELECT students.*, "instructorsClasses".*
+    SELECT students.*, "instructorsClasses"."instructorId"
     FROM students
     JOIN "classEnrollment" ON students.id = "classEnrollment"."studentId"
     JOIN "instructorsClasses" ON "instructorsClasses"."classroomId" = "classEnrollment"."classroomId"
     WHERE students.id = $1
     `, [id])
 
-    console.log('Student in Student DB functon', student)
     return student;
   } catch (error) {
     throw error

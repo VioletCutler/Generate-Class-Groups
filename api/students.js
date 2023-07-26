@@ -103,12 +103,7 @@ studentsRouter.patch(
       const { studentId } = req.params;
       const { name } = req.body;
 
-      console.log('Req.Params:', req.params)
-      console.log('Req.Body', req.body)
-      console.log('Req.instructor', req.instructor)
-
       const studentToUpdate = await getInstructorIdByStudentId({id: studentId})
-      console.log('Student To Update', studentToUpdate)
       if (!studentToUpdate) {
         next(ApiError.badRequest("No student to update."));
       }
@@ -118,9 +113,8 @@ studentsRouter.patch(
 
       const updateObject = {};
       if (name === studentToUpdate.name){
-  
         res.send({success: true, studentToUpdate,
-        message: "Student successfully updated"})
+        message: "Student name is the same. No need to update."})
         return 
       }
       if (name) updateObject.name = name;
