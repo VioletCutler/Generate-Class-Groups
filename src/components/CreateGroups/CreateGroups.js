@@ -35,8 +35,6 @@ const CreateGroups = () => {
     fetchStudents();
   }, []);
 
-  console.log("classList", classList);
-
   function handleAbsentStudentClick(e) {
     e.preventDefault();
     const [absentStudent] = classList.filter(
@@ -46,41 +44,87 @@ const CreateGroups = () => {
     const updatedClassList = classList.filter(
       (student) => student.id != e.target.id
     );
-    // for (let i = 0; i < classList.length; i++){
-    //     if (i != e.target.id)updatedClassList.push(classList[i])
-    // }
     setClassList(updatedClassList);
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-
-    console.log("Generate Groups");
-
     const generatedGroups = createGroupsObject(classList, 3);
-    console.log("Final Groups", generatedGroups);
     const finalGroupsArray = []
     for (let key in generatedGroups){
-        console.log('Generated Group', typeof generatedGroups[key])
         if (typeof generatedGroups[key] === 'object'){
             finalGroupsArray.push(generatedGroups[key])
         }
     }
-    console.log(finalGroupsArray)
     setFinalGroups(finalGroupsArray)
+  }
+
+  function convertToCSV(objArray) {
+    var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+    var str = '';
+
+    for (var i = 0; i < array.length; i++) {
+        var line = '';
+        for (var index in array[i]) {
+            if (line != '') line += ','
+
+            line += array[i][index];
+        }
+
+        str += line + '\r\n';
+    }
+
+    return str;
+}
+
+  function exportToCSV(){
+    console.log('Export to CSV')
+    console.log('Final Groups', finalGroups)
+    const array = []
+    for (let i = 0; i < finalGroups.length; i++){
+        const currentGroup = finalGroups[i];
+        const currentGroupArray = []
+        for (let k = 0; k < currentGroup.length; k++){
+            currentGroupArray.push(currentGroup[k].name)
+        }
+        array.push(currentGroupArray)
+    }
+
+
+
+
+    const jsonObject = JSON.stringify(array);
+    console.log('Convert Obj to JSON', jsonObject)
+
+
+
+    
+    const CSVConvertedText = convertToCSV(jsonObject)
+    
+    console.log('CSV Converted Text', CSVConvertedText)
+
+    var encodedUri = encodeURI(CSVConvertedText);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "my_data.csv");
+    document.body.appendChild(link); // Required for FF
+    
+    link.click();
   }
 
   return (
     <div>
       {finalGroups && finalGroups.length ? (
-        <div>{finalGroups.map((group, idx) => {
+        <div>
+            <button onClick={exportToCSV}>Export to CSV</button>
+            {finalGroups.map((group, idx) => {
 
             return(
             <div key={idx}>
             <p>Group #{idx + 1}</p>
-            {group.map((student) => {
+            {group.map((student, studentIdx) => {
                 return(
-                    <div>{student.name}</div>
+                    <div key={studentIdx}>{student.name}</div>
                 )
             })}
             </div>
