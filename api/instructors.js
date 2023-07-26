@@ -178,7 +178,6 @@ instructorsRouter.post("/login", async (req, res, next) => {
           expiresIn: JWT_EXPIRES_IN
         }
       );
-      console.log('token', token)
       res.send({
         success: true,
         user,

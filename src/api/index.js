@@ -9,7 +9,6 @@ export async function apiHealth() {
 
 export async function registerUser({ name, username, email, password }) {
   try {
-    console.log(name, username, email, password);
     const response = await fetch(
       "http://localhost:1337/api/instructors/register",
       {
@@ -26,7 +25,6 @@ export async function registerUser({ name, username, email, password }) {
       }
     );
     const data = await response.json();
-    console.log("Data from register:", data);
     return data;
   } catch (error) {
     console.error(error);
@@ -57,7 +55,6 @@ export async function loginUser({ username, password }) {
 
 export async function createClassroom({ classroomName, inSession }) {
   try {
-    console.log('classroomName:', classroomName)
     const response = await fetch("http://localhost:1337/api/classrooms", {
       method: "POST",
       headers: {
@@ -72,7 +69,7 @@ export async function createClassroom({ classroomName, inSession }) {
     const data = response.json();
     return data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -89,7 +86,6 @@ export async function getMe() {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log('error')
     console.error(error);
   }
 }
@@ -117,7 +113,7 @@ export async function updateUserInfo({
     const data = response.json();
     return data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -133,7 +129,7 @@ export async function deleteAccount(instructorId){
     const data = await response.json();
     return data
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -150,7 +146,7 @@ export async function getClassroomById(id) {
     const data = await response.json();
     return data
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -169,7 +165,7 @@ export async function updateClassroomInfo({id, name, inSession}){
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -185,7 +181,7 @@ export async function deleteClassroom(id) {
     const data = await response.json();
     return data
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -205,7 +201,7 @@ export async function addStudentToClass({student, classroomId}){
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -224,7 +220,7 @@ export async function updateStudent({studentId, name}){
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -241,7 +237,7 @@ export async function getStudentById(id){
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -259,6 +255,6 @@ export async function deleteStudent(id){
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }

@@ -7,11 +7,6 @@ const jwt = require("jsonwebtoken");
 const { getInstructorById } = require("../db");
 const ApiError = require('./error/ApiError')
 
-// router.use('*', (req, res, next)=> {
-//     console.log('a request is being made to the API router')
-//     next()
-// })
-
 router.use("/health", async (req, res, next) => {
   try {
     const uptime = process.uptime();
@@ -37,24 +32,16 @@ router.use(async (req, res, next) => {
       const token = auth.slice(prefix.length);
       console.log('token:', token)
       const isValidToken = jwt.verify(token, JWT_SECRET, (err, decoded) => {
-        console.log('__jwt verify__')
-        console.log('err:', err)
-        console.log('decoded:', decoded)
         if (err) {
-          console.log('line 44')
           return next(ApiError.badRequest(err.message));
         } else {
           return decoded.id
         }
       });
-
-      console.log('Is Valid Token:', isValidToken)
       if (!isValidToken) {
-        console.log('line 52')
         next();
         return;
       } else {
-        console.log('line 56')
         const instructor = await getInstructorById({id: isValidToken});
         req.instructor = instructor;
         next();

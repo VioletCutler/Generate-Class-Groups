@@ -5,31 +5,31 @@ import { useParams, useNavigate } from "react-router-dom";
 const Student = ({ setStudents }) => {
   const { studentId } = useParams();
   const navigate = useNavigate();
-  const [classroomId, setClassroomId] = useState(0)
+  const [classroomId, setClassroomId] = useState(0);
   const [student, setStudent] = useState({});
   const [updateForm, setUpdateForm] = useState(false);
   const [name, setName] = useState("");
-  const [deleteStudentPrompt, setDeleteStudentPrompt] = useState(false)
+  const [deleteStudentPrompt, setDeleteStudentPrompt] = useState(false);
 
+  // Fetch and set Student info on state
   useEffect(() => {
     async function fetchStudent(id) {
       try {
         const response = await getStudentById(id);
-        console.log("response", response);
         if (response.success) {
           setStudent(response.student);
-          setClassroomId(response.student.classroomId)
+          setClassroomId(response.student.classroomId);
         } else {
-          navigate('/classrooms')
+          navigate("/classrooms");
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
     fetchStudent(studentId);
   }, []);
 
-  async function handleSubmit(e) {
+  async function handleUpdate(e) {
     e.preventDefault();
     try {
       const response = await updateStudent({
@@ -37,31 +37,22 @@ const Student = ({ setStudents }) => {
         name,
       });
       if (response.success) {
-        console.log('response:', response)
-        // student = response.studentToUpdate
-        // const updatedStudentList = students.filter(
-        //   (student) => student.studentId != response.updatedStudent.studentId
-        // );
-        // updatedStudentList.push(response.updatedStudent);
-        // setStudents(updatedStudentList);
         setUpdateForm(false);
-        navigate(`/classrooms/${classroomId}`)
-        console.log("response:", response);
+        navigate(`/classrooms/${classroomId}`);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
-  async function handleDelete(){
+  async function handleDelete() {
     try {
-      console.log('student', student)
-      const response = await deleteStudent(student.studentId)
-      if (response.success){
-        navigate(`/classrooms/${classroomId}`)
+      const response = await deleteStudent(student.studentId);
+      if (response.success) {
+        navigate(`/classrooms/${classroomId}`);
       }
     } catch (error) {
-      console.log(error)
+      console.error(error);
     }
   }
 
@@ -70,7 +61,7 @@ const Student = ({ setStudents }) => {
       {student && student.name ? (
         updateForm ? (
           <>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleUpdate}>
               <label htmlFor="update-student-name-input">Name</label>
               <input
                 id="update-student-name-input"
@@ -94,33 +85,36 @@ const Student = ({ setStudents }) => {
               Update Student Name
             </button>
           </>
-          
         )
       ) : null}
-      {deleteStudentPrompt ?  
-      <>
-      <button
-      onClick={() => {
-        handleDelete()
-      }}>
-        Yes
-      </button>
-      <button
-       onClick={() => {
-        setDeleteStudentPrompt(false)
-      }}
-      >Cancel</button>
-      </> : 
-      <button
-      onClick={() => {
-        setDeleteStudentPrompt(true)
-      }}
-    >Delete Student</button>}
+      {deleteStudentPrompt ? (
+        <>
+          <button
+            onClick={() => {
+              handleDelete();
+            }}
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => {
+              setDeleteStudentPrompt(false);
+            }}
+          >
+            Cancel
+          </button>
+        </>
+      ) : (
+        <button
+          onClick={() => {
+            setDeleteStudentPrompt(true);
+          }}
+        >
+          Delete Student
+        </button>
+      )}
     </div>
   );
 };
 
 export default Student;
-
-
-// There needs to be a way to prevent anyone from updating a student

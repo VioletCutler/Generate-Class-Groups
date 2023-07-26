@@ -46,21 +46,17 @@ const UserInfo = ({ userInfo, setUserInfo, setTokenErrorMessage, setLoggedIn }) 
       email,
       isActive,
     });
-    console.log('Should be unchanged user info', userInfo)
     const classrooms = userInfo.classrooms;
     if (name != userInfo.details.name || username != userInfo.details.username){
       function removeAndReplaceInstructor(classroom){
         const [ instructorInfo ] = classroom.instructors.filter((instructor) => instructor.id == userInfo.details.id)
-        console.log('instructorInfo:', instructorInfo)
         instructorInfo.name = response.updatedInstructor.name;
         instructorInfo.username = response.updatedInstructor.username;
-        console.log('updatedInstructorInfo:', instructorInfo)
         const updatedInstructorsList = classroom.instructors.filter((instructor) => instructor.id != userInfo.details.id)
         updatedInstructorsList.push(instructorInfo)
       }
       classrooms.map(removeAndReplaceInstructor)
     }
-    console.log('updatedClassrooms:', classrooms)
     const user = response.updatedInstructor;
     setUserInfo({details:user, classrooms})
 
@@ -78,12 +74,9 @@ const UserInfo = ({ userInfo, setUserInfo, setTokenErrorMessage, setLoggedIn }) 
       setLoggedIn(false);
       navigate("/");
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
-
-  console.log('user info:', userInfo)
-
 
   return (
     <div>

@@ -38,7 +38,7 @@ const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
       setName(response.classroom.classroomInfo.name);
       setInSession(response.classroom.classroomInfo.inSession);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -86,11 +86,6 @@ const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
       const response = await deleteClassroom(id);
 
       const updatedClassroomList = userInfo.classrooms.filter((classroom) => {
-        console.log("classroom.classroomInfo.id", classroom.classroomInfo.id);
-        console.log(
-          "response.deletedClassroom.id",
-          response.deletedClassroom.id
-        );
         return classroom.classroomInfo.id != response.deletedClassroom.id;
       });
 
@@ -99,11 +94,9 @@ const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
         classrooms: [...updatedClassroomList],
       });
 
-      console.log("updated classroom list", updatedClassroomList);
-
       navigate("/classrooms");
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -118,7 +111,7 @@ const SingleClassroom = ({ userInfo, setUserInfo, count, setCount }) => {
         document.getElementById("add-student").value = ""
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 

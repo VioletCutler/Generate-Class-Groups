@@ -12,12 +12,11 @@ const CreateGroups = () => {
     async function fetchStudents(){
         try {
             const response = await getClassroomById(id);
-            console.log('Create Groups Fetch Classroom:', response);
             if (response.success){
                 setClassList(response.classroom.students)
             }
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
 
@@ -26,20 +25,15 @@ const CreateGroups = () => {
         fetchStudents()
     }, [])
 
-
     function handleAbsentStudentClick(e){
         const [ absentStudent ] = classList.filter((student) => student.id == e.target.id)
-        console.log('absentStudent:', absentStudent);
         setAbsentStudents([...absentStudents, absentStudent])
         const updatedClassList = classList.filter((student) => student.id != e.target.id);
         // for (let i = 0; i < classList.length; i++){
         //     if (i != e.target.id)updatedClassList.push(classList[i])
         // }
-        console.log('updatedClassList:', updatedClassList)
         setClassList(updatedClassList)
     }
-
-    console.log('Absent Student State:', absentStudents)
 
     return (
         <div>

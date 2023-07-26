@@ -4,8 +4,6 @@ import { Link } from "react-router-dom";
 const Classrooms = ({userInfo, setUserInfo}) => {
   const [createClassroom, setCreateClassroom] = useState(false);
 
-  console.log('Classrooms user info', userInfo)
-
   return (
     <div>
       <h2>Classrooms and Students</h2>

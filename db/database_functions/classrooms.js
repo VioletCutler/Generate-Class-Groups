@@ -3,7 +3,6 @@ const { client } = require("../client.js");
 // Create New Classroom
 async function createNewClassroom({ name, inSession = true }) {
   try {
-    console.log('Create New Classroom:', name, inSession)
     const {
       rows: [newClass],
     } = await client.query(
@@ -211,8 +210,6 @@ async function getClassroomById({ id }) {
       students: students.rows,
     };
 
-    console.log('Classroom:',classRoom)
-
     return classRoom;
   } catch (error) {
     throw error;
@@ -261,7 +258,6 @@ async function getStudentsByClassroomId({ id }) {
 // Get Classrooms by Instructor
 async function getClassroomsByInstructorId({ instructorId }) {
   try {
-    console.log('Get Classrooms By Instructor Id [instructorId]:', instructorId)
     const { rows } = await client.query(
       `
         SELECT "instructorsClasses".*, classrooms.*
@@ -272,7 +268,6 @@ async function getClassroomsByInstructorId({ instructorId }) {
       [instructorId]
     );
     const classrooms = await Promise.all(rows.map((classroom) =>getClassroomById({id: classroom.id})))
-    console.log('rows:', rows)
     return classrooms;
   } catch (error) {
     throw error;
@@ -289,9 +284,6 @@ async function updateClassroom(id, fields = {}) {
 
   if (setString.length === 0) return;
 
-  console.log("Update Classroom line 219");
-  console.log("Fields :", fields);
-  console.log("Set String :", setString);
   try {
     const {
       rows: [classroom],
@@ -304,7 +296,6 @@ async function updateClassroom(id, fields = {}) {
         `,
       Object.values(fields)
     );
-    console.log('updated classroom :', classroom)
 
     return classroom;
   } catch (error) {

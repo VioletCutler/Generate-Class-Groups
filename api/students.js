@@ -9,7 +9,8 @@ const {
   enrollStudent,
   getClassroomById,
   deleteStudent,
-  getInstructorsByClassroomId
+  getInstructorsByClassroomId, 
+  getInstructorIdByStudentId
 } = require("../db");
 const { requireAuthorization, requireAdmin } = require("./utils/utils.js");
 const ApiError = require("./error/ApiError");
@@ -32,7 +33,6 @@ studentsRouter.get('/:studentId', requireAuthorization, async (req, res, next) =
   try {
     const { studentId } = req.params;
     const student = await getStudentById({id: studentId})
-    console.log('student:', student)
     if (student){
       const instructors = await getInstructorsByClassroomId({id: student.classroomId})
       const correctInstructor = instructors.filter((instructor) => instructor.id == req.instructor.id)
@@ -103,14 +103,18 @@ studentsRouter.patch(
       const { studentId } = req.params;
       const { name } = req.body;
 
-      console.log('received studentId:', studentId)
+      console.log('Req.Params:', req.params)
+      console.log('Req.Body', req.body)
+      console.log('Req.instructor', req.instructor)
 
-      const studentToUpdate = await getStudentById({ id: studentId });
+      const studentToUpdate = await getInstructorIdByStudentId({id: studentId})
+      console.log('Student To Update', studentToUpdate)
       if (!studentToUpdate) {
         next(ApiError.badRequest("No student to update."));
       }
-
-      console.log('name:', name, 'studentTOUpdate:', studentToUpdate)
+      if (studentToUpdate.instructorId != req.instructor.id){
+        next(ApiError.badRequest("You do not have authorization to update this student"))
+      }
 
       const updateObject = {};
       if (name === studentToUpdate.name){
@@ -120,9 +124,7 @@ studentsRouter.patch(
         return 
       }
       if (name) updateObject.name = name;
-      console.log("Update Object", updateObject);
       const updatedStudent = await updateStudent(studentId, updateObject);
-      console.log("updated student", updatedStudent);
       if (updatedStudent) {
         res.send({
           success: true,
@@ -149,8 +151,6 @@ studentsRouter.delete(
       const usersStudents = await getStudentsByInstructor({
         id: req.instructor.id,
       });
-      console.log("Users Students:", usersStudents);
-      console.log(studentId);
       const correctStudent = usersStudents.filter(
         (student) => student.id == studentId
       );
