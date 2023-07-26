@@ -4,8 +4,6 @@ import { Link } from "react-router-dom";
 const Classrooms = ({userInfo, setUserInfo}) => {
   const [createClassroom, setCreateClassroom] = useState(false);
 
-  console.log('Classrooms user info', userInfo)
-
   return (
     <div>
       <h2>Classrooms and Students</h2>
@@ -27,13 +25,13 @@ const Classrooms = ({userInfo, setUserInfo}) => {
                   className="profile-classroom-section"
                   key={classroomInfo.id}
                 >
-                  <Link to={`/classroom/${classroomInfo.id}`}>
+                  <Link to={`/classrooms/${classroomInfo.id}`}>
                     {classroomInfo.name}
                   </Link>
-                  <h4>Instructors:</h4>
+                  {/* <h4>Instructors:</h4>
                   {instructors.map((instructor) => {
                     return <p key={instructor.id}>{instructor.name}</p>;
-                  })}
+                  })} */}
                 </div>
               );
             })

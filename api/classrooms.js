@@ -82,7 +82,6 @@ classroomsRouter.post("/", requireAuthorization, async (req, res, next) => {
         instructorId: req.instructor.id,
       });
 
-      console.log("classrooms router POST /");
       res.send({
         success: true,
         classroom: {
@@ -105,7 +104,7 @@ classroomsRouter.patch(
     try {
       const { classroomId } = req.params;
       const { name, inSession } = req.body;
-      console.log("PATCH /classrooms (name)", name);
+      
       //confirm that classroom exists
       const _classroom = await getClassroomByName({ classroomName: name });
 

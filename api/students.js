@@ -9,6 +9,8 @@ const {
   enrollStudent,
   getClassroomById,
   deleteStudent,
+  getInstructorsByClassroomId, 
+  getInstructorIdByStudentId
 } = require("../db");
 const { requireAuthorization, requireAdmin } = require("./utils/utils.js");
 const ApiError = require("./error/ApiError");
@@ -27,40 +29,71 @@ studentsRouter.get("/", requireAdmin, async (req, res) => {
   }
 });
 
-studentsRouter.post("/enrollment", requireAuthorization, async (req, res, next) => {
-  const { student, classroomId } = req.body;
-
+studentsRouter.get('/:studentId', requireAuthorization, async (req, res, next) => {
   try {
-    //confirm that a classrooms exists for student to be enrolled into
-  const classroom = await getClassroomById({ id: classroomId });
-  const correctInstructor = classroom.instructors.filter((instructor) => instructor.id == req.instructor.id)
-  if (classroom.classroomInfo === undefined) {
-    next(
-      ApiError.badRequest(
-        "This classroom id does not match an existing classroom."
-      )
-    );
-  } else if (!correctInstructor.length) {
-    next(
-      ApiError.unauthorizedRequest("You can only enroll students in your classrooms")
-    )
-  } else {
-    //create new student
-    const createdStudent = await createStudent({ name: student });
-
-    //enroll new student in class
-    await enrollStudent({
-      studentId: createdStudent.id,
-      classroomId,
-    });
-
-    res.send({ success: true, student: createdStudent });
+    const { studentId } = req.params;
+    const student = await getStudentById({id: studentId})
+    if (student){
+      const instructors = await getInstructorsByClassroomId({id: student.classroomId})
+      const correctInstructor = instructors.filter((instructor) => instructor.id == req.instructor.id)
+      if (correctInstructor.length){
+        res.send({success: true, student})
+      } else {
+        next(ApiError.unauthorizedRequest('Unauthorized user.'))
+        return
+      }
+    } else {
+      next(ApiError.badRequest('No student found.'))
+      return
+    }
+   
+ 
+  } catch (error) {
+    throw error
   }
-  } catch (e) {
-    next(ApiError.internal("There was an error creating this student."));
+})
+
+studentsRouter.post(
+  "/enrollment",
+  requireAuthorization,
+  async (req, res, next) => {
+    const { student, classroomId } = req.body;
+
+    try {
+      //confirm that a classrooms exists for student to be enrolled into
+      const classroom = await getClassroomById({ id: classroomId });
+      const correctInstructor = classroom.instructors.filter(
+        (instructor) => instructor.id == req.instructor.id
+      );
+      if (classroom.classroomInfo === undefined) {
+        next(
+          ApiError.badRequest(
+            "This classroom id does not match an existing classroom."
+          )
+        );
+      } else if (!correctInstructor.length) {
+        next(
+          ApiError.unauthorizedRequest(
+            "You can only enroll students in your classrooms"
+          )
+        );
+      } else {
+        //create new student
+        const createdStudent = await createStudent({ name: student });
+
+        //enroll new student in class
+        await enrollStudent({
+          studentId: createdStudent.id,
+          classroomId,
+        });
+
+        res.send({ success: true, student: createdStudent });
+      }
+    } catch (e) {
+      next(ApiError.internal("There was an error creating this student."));
+    }
   }
-  
-});
+);
 
 studentsRouter.patch(
   "/:studentId",
@@ -70,21 +103,31 @@ studentsRouter.patch(
       const { studentId } = req.params;
       const { name } = req.body;
 
-      const studentToUpdate = await getStudentById({ id: studentId });
+      const studentToUpdate = await getInstructorIdByStudentId({id: studentId})
       if (!studentToUpdate) {
         next(ApiError.badRequest("No student to update."));
       }
-      console.log('Student To Update:', studentToUpdate)
+      if (studentToUpdate.instructorId != req.instructor.id){
+        next(ApiError.badRequest("You do not have authorization to update this student"))
+      }
+
       const updateObject = {};
+      if (name === studentToUpdate.name){
+        res.send({success: true, studentToUpdate,
+        message: "Student name is the same. No need to update."})
+        return 
+      }
       if (name) updateObject.name = name;
-      console.log('Update Object', updateObject)
       const updatedStudent = await updateStudent(studentId, updateObject);
-      if (updatedStudent){
-        res.send({ success: true, updatedStudent, message: "Student successfully updated"});
+      if (updatedStudent) {
+        res.send({
+          success: true,
+          updatedStudent,
+          message: "Student successfully updated",
+        });
       } else {
         next(ApiError.internal("There was an error updating this student."));
-    }
-
+      }
     } catch (e) {
       next(ApiError.internal("There was an error updating this student."));
     }
@@ -92,18 +135,16 @@ studentsRouter.patch(
 );
 
 studentsRouter.delete(
-  "/enrollment",
+  "/:studentId",
   requireAuthorization,
   async (req, res, next) => {
     try {
-      const { studentId } = req.body;
+      const { studentId } = req.params;
 
       //confirm that the student to delete is in fact this instructors student
       const usersStudents = await getStudentsByInstructor({
         id: req.instructor.id,
       });
-      console.log('Users Students:', usersStudents)
-      console.log(studentId)
       const correctStudent = usersStudents.filter(
         (student) => student.id == studentId
       );
@@ -126,7 +167,8 @@ studentsRouter.delete(
         next(ApiError.internal("Something went wrong."));
       }
     } catch (e) {
-    next(ApiError.internal("There was an error deleting this student."));    }
+      next(ApiError.internal("There was an error deleting this student."));
+    }
   }
 );
 

@@ -14,6 +14,7 @@ import {
   UserInfo,
   Classrooms,
   SingleClassroom,
+  Student
 } from "./components/index";
 import { getMe } from "./api/index";
 
@@ -97,7 +98,7 @@ const App = () => {
                 }
               />
               <Route
-                path="/classroom/:id"
+                path="/classrooms/:id"
                 element={
                   <SingleClassroom
                     setUserInfo={setUserInfo}
@@ -123,6 +124,14 @@ const App = () => {
                     setCount={setCount}
                   />
                 }
+              />
+              <Route
+              path="/studentinfo/:studentId"
+              element={
+                <Student 
+
+                />
+              } 
               />
               <Route path="*" element={<p>Path not resolved</p>} />
             </>

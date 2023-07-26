@@ -33,7 +33,6 @@ async function createInstructor({
       `,
       [name, username, hashedPassword, isAdmin, email, isActive]
     );
-    console.log("create user DB function:", user);
     return user;
   } catch (error) {
     throw error;
@@ -76,7 +75,6 @@ async function getStudentsByInstructor({ id }) {
 // Get Instructor by Username
 async function getInstructorByUsername({ username }) {
   try {
-    console.log("line 63 instructors");
     const {
       rows: [instructor],
     } = await client.query(

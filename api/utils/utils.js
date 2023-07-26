@@ -28,7 +28,6 @@ function requireAdmin(req, res, next) {
 //Check to see if req.instructor.id is the same as the instructor id OR if the user is an admin
 
 function requireAdminOrAuthorizedUser(req, res, next) {
-  console.log("req.instructor", req.instructor);
   if (!req.instructor.isAdmin || !req.instructor) {
     next(ApiError.badRequest("You are not authorized to make that request"));
     return;

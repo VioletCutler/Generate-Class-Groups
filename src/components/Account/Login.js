@@ -21,7 +21,7 @@ const Login = ({ setRegistered, setLoggedIn }) => {
         setErrorMessage(data.message)
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 

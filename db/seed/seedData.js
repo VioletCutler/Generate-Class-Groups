@@ -374,7 +374,6 @@ function createSeedInstructorAssignments(instructorsList){
       })
 
     }
-    console.log('Class Assignments :', seedClassAssignments)
 
     return seedClassAssignments;
 }

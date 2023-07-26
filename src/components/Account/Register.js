@@ -15,11 +15,10 @@ const Register = ({ setRegistered, setLoggedIn }) => {
     const data = await registerUser({ name, username, email, password });
     if (data.success){
       localStorage.setItem('token', data.token);
-      console.log('Token check', data.token === localStorage.getItem('token'))
       setLoggedIn(true);
     }
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
